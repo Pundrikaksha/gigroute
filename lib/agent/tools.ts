@@ -1,8 +1,7 @@
 import 'server-only'
 import type { ChatCompletionFunctionTool } from 'openai/resources/chat/completions'
-import { getQlooClient } from '../qloo'
-
-const qloo = getQlooClient()
+import { getQlooClient, type QlooClient } from '../qloo'
+import { draftPitch } from './plan'
 
 export interface ToolArgs {
   artist_name?: string
@@ -48,7 +47,8 @@ export const tools: ChatCompletionFunctionTool[] = [
     type: 'function',
     function: {
       name: 'fan_hotspots',
-      description: 'Find cities/areas where fans of this taste concentrate.',
+      description:
+        'Find cities where fans of this taste concentrate. Pass the artist ID plus its top 3 similar artist IDs so explainability shows which artists drove each city.',
       parameters: {
         type: 'object',
         properties: {
@@ -63,7 +63,8 @@ export const tools: ChatCompletionFunctionTool[] = [
     type: 'function',
     function: {
       name: 'venues_in_city',
-      description: 'Rank venues/bars/record shops in a city whose audience overlaps the taste.',
+      description:
+        'Rank venues/bars/record shops in a city whose audience overlaps the taste. Pass the artist ID plus its top 3 similar artist IDs; call once per stop (parallel calls are fine).',
       parameters: {
         type: 'object',
         properties: {
@@ -121,7 +122,7 @@ export const tools: ChatCompletionFunctionTool[] = [
   },
 ]
 
-export async function executeTool(name: string, args: ToolArgs) {
+export async function executeTool(name: string, args: ToolArgs, qloo: QlooClient = getQlooClient()) {
   const entityIds = args.entity_ids ?? []
   switch (name) {
     case 'resolve_artist': {
@@ -145,7 +146,7 @@ export async function executeTool(name: string, args: ToolArgs) {
       // For mock, just return the stops in order they came or random sort
       return args.stops ?? []
     case 'draft_pitch':
-      return `Hi ${args.venue_name} booking team, I represent ${args.artist_name}. We noticed our audience overlaps significantly with your typical crowd (${args.why || 'great venue'}). We'd love to discuss a potential date.`
+      return draftPitch(args.venue_name ?? 'there', args.artist_name ?? 'our artist', args.why)
     default:
       throw new Error(`Unknown tool: ${name}`)
   }

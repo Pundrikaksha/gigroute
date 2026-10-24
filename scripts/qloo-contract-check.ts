@@ -41,8 +41,13 @@ async function checkContract() {
     const venuesRes = await client.venuesInCity([artistId], 'London', 2)
     safePrint('venuesInCity', venuesRes)
 
+    console.log(`venuesInCity explainability present: ${venuesRes.some((v) => v.explainability.length > 0)}\n`)
+
     const crossDomainRes = await client.crossDomain([artistId], 'brand')
     safePrint('crossDomain', crossDomainRes)
+
+    const tagsRes = await client.findTags('indie', 'urn:entity:artist')
+    safePrint('findTags', tagsRes)
 
     console.log("Contract check completed successfully.")
   } catch (error) {

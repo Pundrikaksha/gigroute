@@ -1,54 +1,108 @@
 # GigRoute
 
-GigRoute is a taste-grounded tour planner for independent musicians. It uses an agent interacting with the Qloo Taste API to plan a tour route, find similar artists for local co-bills, locate fan hotspots, find suitable venues, and suggest merch/poster ideas based on cross-domain tastes. 
+**Route your next tour to where your fans already are.**
 
-## Qloo Endpoints Used and Why
-- `GET /search?query=..&types=..`: Used to resolve an artist's name to Qloo entity IDs.
-- `GET /v2/tags?filter.query=..`: To find tags associated with an entity.
-- `GET /v2/insights`: Used via specific queries (and not the standard `/recommendations` endpoint) for finding:
-  - Similar artists (local co-bill ideas)
-  - Fan hotspots (cities where fans of this taste concentrate)
-  - Top venues/bars/record shops in each top city whose audience overlaps the taste
-  - Cross-domain tastes (brands, movies) for merch/poster ideas
+GigRoute is a taste-grounded tour planner for independent musicians, built on the [Qloo Taste AI](https://docs.qloo.com) Insights API. Enter your artist (or a better-known artist you sound like) and a region. An agent then:
 
-## Setup
+1. resolves the artist in Qloo and finds similar artists for local co-bills,
+2. ranks the cities where audiences for that taste over-index (fan hotspots),
+3. ranks venues, bars and record shops in each city by audience affinity,
+4. finds cross-domain tastes (brands, films) for merch and poster ideas,
+5. orders the stops into a route and drafts a data-backed pitch for each venue.
 
-The app can run completely offline without keys using built-in mock data. 
+Every city and venue has a **“Why this city / venue?”** panel built from Qloo's `query.affinity` and `query.explainability`: the affinity score, the tags that match your sound, and the artists whose fans drove the result.
 
-1. Install dependencies:
-   ```bash
-   npm i
-   ```
+> **Try it in one click:** the landing page has a **“See a sample tour”** button (Radiohead · UK). It always runs on built-in sample data, so it works instantly with no keys.
 
-2. Run the development server:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick start
 
-## Environment Variables
+Requires Node 20 or 22 (see `.nvmrc`).
 
-Copy `.env.example` to `.env.local` and fill in the values if you want to use the real APIs.
+```bash
+nvm use            # optional, picks Node 22
+npm ci
+npm run dev        # http://localhost:3000
+```
 
-- `QLOO_API_KEY`: Your Qloo API Key.
-- `QLOO_BASE_URL`: Defaults to `https://hackathon.api.qloo.com`.
-- `QLOO_MOCK`: Set to `1` to force mock mode even if `QLOO_API_KEY` is present.
-- `LLM_BASE_URL`: OpenAI-compatible endpoint URL.
-- `LLM_API_KEY`: API key for the LLM. If unset, a deterministic `MockLLM` is used.
-- `LLM_MODEL`: Model name (e.g., `gpt-4o`).
+With no environment variables, the app runs in **mock mode**: a deterministic mock LLM drives the agent against hand-written fixture data. No network calls are made to Qloo or to any LLM.
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` / `npm start` | Production build and server |
+| `npm test` | Vitest unit tests (all mocked, no network) |
+| `npm run lint` | ESLint |
+| `npx tsx scripts/qloo-contract-check.ts` | Optional live contract check against Qloo. Needs `QLOO_API_KEY` in your shell; prints only status and keys, never data. |
+
+## Environment variables
+
+Set these in `.env.local` for local development (it is gitignored) or in **Vercel → Project → Settings → Environment Variables**. Never commit real values.
+
+| Variable | Required | Example (empty means unset) | Purpose |
+| --- | --- | --- | --- |
+| `QLOO_API_KEY` | For live Qloo | `QLOO_API_KEY=` | Sent as the `X-Api-Key` header. If empty, mock mode is used. |
+| `QLOO_BASE_URL` | No | `QLOO_BASE_URL=` | Defaults to `https://hackathon.api.qloo.com`. |
+| `QLOO_MOCK` | No | `QLOO_MOCK=` | Set to `1` to force mock Qloo data even when a key is present. |
+| `LLM_BASE_URL` | No | `LLM_BASE_URL=` | Any OpenAI-compatible chat completions endpoint. Defaults to OpenAI. |
+| `LLM_API_KEY` | For a live LLM | `LLM_API_KEY=` | If empty, the deterministic `MockLLM` plans the tour. |
+| `LLM_MODEL` | With `LLM_API_KEY` | `LLM_MODEL=` | Model name for the endpoint above. Must support tool calling. |
+
+**Going live:** set `QLOO_API_KEY` (and leave `QLOO_MOCK` unset). That is the only change. The real client already sends the documented requests (see below). The LLM is independent: with no LLM key, the mock LLM drives the real Qloo client.
+
+## Deploy to Vercel
+
+1. Push this repo to GitHub and **Import Project** in Vercel (framework preset: Next.js, defaults are fine).
+2. Vercel reads `"engines": { "node": ">=20 <23" }` from `package.json` and uses Node 22.
+3. Optionally add the environment variables above. Without them, the deployment runs fully in mock mode, which is good for a judging demo.
+4. Deploy. `/api/plan` is a streaming (SSE) route function; `/` and `/plan` are static.
+
+A build with `QLOO_MOCK=1` and no LLM key is tested as part of CI-style verification (`npm ci && npm run build && npm test && npm run lint`).
+
+## How GigRoute uses the Qloo API
+
+All requests are `GET` with the `X-Api-Key` header. The parameters are built in `lib/qloo/requests.ts`, the same builders feed the mock, and the URLs are asserted in `tests/params.test.ts`.
+
+| Purpose | Request |
+| --- | --- |
+| Resolve artist | `GET /search?query=<name>&types=urn:entity:artist&take=10` |
+| Tag lookup | `GET /v2/tags?filter.query=<q>&filter.parents.types=urn:entity:artist&take=20` |
+| Similar artists (co-bills) | `GET /v2/insights?filter.type=urn:entity:artist&signal.interests.entities=<id>&take=6` |
+| Fan hotspots | `GET /v2/insights?filter.type=urn:entity:destination&signal.interests.entities=<ids>&feature.explainability=true&take=10[&filter.location.query=<region>]` |
+| Venues per city | `GET /v2/insights?filter.type=urn:entity:place&signal.interests.entities=<ids>&filter.location.query=<city>&feature.explainability=true&take=5` |
+| Merch cues | `GET /v2/insights?filter.type=urn:entity:brand` or `urn:entity:movie` `&signal.interests.entities=<id>&take=5` |
+
+- `take` is clamped to the documented maximum of 50.
+- For hotspots and venues, GigRoute signals on the artist **plus its top 3 similar artists**. Explainability then shows which of those artists' fans drove each result.
+- Responses are parsed from `results.entities[]` (insights), `results[]` (search) and `results.tags[]` (tags). Each entity contributes `entity_id`, `name`, `subtype`, `properties`, `location`, `tags`, `popularity`, `query.affinity` and `query.explainability["signal.interests.entities"]`.
+- Successful GETs are cached in memory for 24 hours (LRU, 500 entries). 429 and 5xx responses are retried twice.
+
+## Mock mode notes
+
+- Fixtures in `lib/qloo/fixtures/mock-data.json` are **hand-written fake data**, not real API responses. They copy the documented response shapes. Entity IDs are prefixed `mock-`, and addresses are placeholders.
+- Mock search knows Radiohead, The Strokes, Big Thief and Khruangbin. Other names show the “no match” empty state.
+- Mock hotspots cover London, Manchester, Bristol, New York, Chicago, Los Angeles, Austin and Seattle. `filter.location.query` filters them by name (for example `UK` or `USA`).
+- Fixture explainability is written against the seed artist. When you plan for another mock artist, the seed's share is credited to that artist.
+- Mock runs add a 250 ms pause between agent steps so the streaming UI is visible. Tests run without the pause.
+- Mock mode is active when `QLOO_MOCK=1` or `QLOO_API_KEY` is empty. The demo preset (`demo=1`) always uses mock mode.
 
 ## Architecture
-- **Next.js 14+ App Router** with React 19.
-- **Tailwind CSS** for styling.
-- **React Leaflet** for maps.
-- **Agent**: An AI agent wrapper built around tools that interface with Qloo endpoints. Output is streamed using Server-Sent Events (SSE).
-- **Cache**: In-memory LRU cache to reduce redundant API calls.
 
-## Known Limits
-- The mock mode uses hardcoded fixtures.
-- Map routing uses naive nearest-neighbor instead of true road distance routing.
+- **Next.js App Router** (React 19, Tailwind CSS 4), deployed on Vercel.
+- `lib/qloo`: `RealQlooClient` and `MockQlooClient` behind one `QlooClient` interface, with shared request builders and normalizers.
+- `lib/agent`: a tool-calling agent over any OpenAI-compatible LLM (or `MockLLM`). Tool results are folded into a typed `Plan` (`lib/agent/plan.ts`), and a snapshot of that plan streams to the browser over SSE after every step.
+- `app/plan`: renders the streamed plan, with progress, skeletons, empty and error states, the explainability panels, and a Leaflet/OpenStreetMap route map.
 
-## Responsible Data Use
-- **No Personally Identifiable Information (PII)** is sent to Qloo. Only artist names and general locations are sent.
-- Qloo data is not committed to the repository (the real API key must never be committed).
-- Results describe general group tendencies, not specific individual tastes.
+## Known limits
+
+- Routing is greedy nearest-neighbour on straight-line distance, not road routing or dates.
+- Qloo returns *places* in general, so results can include bars and record shops as well as venues. There is no capacity or availability data.
+- The `filter.location.query` locality matching is fuzzy on Qloo's side. Very broad or unusual regions may return no destinations.
+- The cache lives in memory per serverless instance. It is not shared and is lost on a cold start.
+- Each plan makes up to roughly 10 Qloo requests and up to 12 LLM calls. Watch rate limits on shared hackathon keys.
+- The explainability field layout follows the Insights docs description (`query.explainability` keyed by signal, with per-entity scores normalized 0–1). If the live API differs, the panels fall back to affinity and tags.
+
+## Responsible data use
+
+- No personal data is sent to Qloo. Only artist names, entity IDs and place names are sent.
+- No Qloo data is committed to the repo; the fixtures are fabricated.
+- Affinities describe group tendencies of audiences, not individual preferences, and the UI says so.
