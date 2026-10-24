@@ -1,95 +1,3282 @@
 {
-  "artists": [
-    {
-      "id": "urn:entity:artist:mock-radiohead",
-      "name": "Radiohead",
-      "type": "urn:entity:artist"
-    },
-    {
-      "id": "urn:entity:artist:mock-the-strokes",
-      "name": "The Strokes",
-      "type": "urn:entity:artist"
-    }
-  ],
-  "similar_artists": [
-    { "id": "urn:entity:artist:mock-thom-yorke", "name": "Thom Yorke", "type": "urn:entity:artist", "affinity": 0.95 },
-    { "id": "urn:entity:artist:mock-muse", "name": "Muse", "type": "urn:entity:artist", "affinity": 0.8 },
-    { "id": "urn:entity:artist:mock-arcade-fire", "name": "Arcade Fire", "type": "urn:entity:artist", "affinity": 0.75 },
-    { "id": "urn:entity:artist:mock-the-smashing-pumpkins", "name": "The Smashing Pumpkins", "type": "urn:entity:artist", "affinity": 0.7 },
-    { "id": "urn:entity:artist:mock-interpol", "name": "Interpol", "type": "urn:entity:artist", "affinity": 0.85 },
-    { "id": "urn:entity:artist:mock-yeah-yeah-yeahs", "name": "Yeah Yeah Yeahs", "type": "urn:entity:artist", "affinity": 0.82 }
-  ],
-  "hotspots": [
-    { "id": "urn:entity:destination:mock-london", "name": "London, UK", "type": "urn:entity:destination", "lat": 51.5074, "lng": -0.1278 },
-    { "id": "urn:entity:destination:mock-manchester", "name": "Manchester, UK", "type": "urn:entity:destination", "lat": 53.4808, "lng": -2.2426 },
-    { "id": "urn:entity:destination:mock-new-york", "name": "New York, USA", "type": "urn:entity:destination", "lat": 40.7128, "lng": -74.0060 },
-    { "id": "urn:entity:destination:mock-chicago", "name": "Chicago, USA", "type": "urn:entity:destination", "lat": 41.8781, "lng": -87.6298 },
-    { "id": "urn:entity:destination:mock-los-angeles", "name": "Los Angeles, USA", "type": "urn:entity:destination", "lat": 34.0522, "lng": -118.2437 },
-    { "id": "urn:entity:destination:mock-austin", "name": "Austin, USA", "type": "urn:entity:destination", "lat": 30.2672, "lng": -97.7431 },
-    { "id": "urn:entity:destination:mock-seattle", "name": "Seattle, USA", "type": "urn:entity:destination", "lat": 47.6062, "lng": -122.3321 },
-    { "id": "urn:entity:destination:mock-bristol", "name": "Bristol, UK", "type": "urn:entity:destination", "lat": 51.4545, "lng": -2.5879 }
-  ],
-  "venues": {
-    "London, UK": [
-      { "id": "urn:entity:place:mock-o2-academy-brixton", "name": "O2 Academy Brixton", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Highly rated by alternative rock fans." } },
-      { "id": "urn:entity:place:mock-the-roundhouse", "name": "The Roundhouse", "type": "urn:entity:place", "affinity": 0.9, "explainability": { "why": "Frequent host for experimental acts." } },
-      { "id": "urn:entity:place:mock-alexandra-palace", "name": "Alexandra Palace", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Large capacity indie rock venue." } },
-      { "id": "urn:entity:place:mock-rough-trade-east", "name": "Rough Trade East", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Popular record store for this demographic." } },
-      { "id": "urn:entity:place:mock-camden-assembly", "name": "The Camden Assembly", "type": "urn:entity:place", "affinity": 0.75, "explainability": { "why": "Intimate venue for emerging bands." } }
-    ],
-    "New York, USA": [
-      { "id": "urn:entity:place:mock-brooklyn-steel", "name": "Brooklyn Steel", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Top spot for indie and electronic music." } },
-      { "id": "urn:entity:place:mock-bowery-ballroom", "name": "Bowery Ballroom", "type": "urn:entity:place", "affinity": 0.92, "explainability": { "why": "Classic NYC venue for alternative bands." } },
-      { "id": "urn:entity:place:mock-webster-hall", "name": "Webster Hall", "type": "urn:entity:place", "affinity": 0.88, "explainability": { "why": "Historic venue with overlapping fan base." } },
-      { "id": "urn:entity:place:mock-rough-trade-nyc", "name": "Rough Trade NYC", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Iconic record store in NY." } },
-      { "id": "urn:entity:place:mock-terminal-5", "name": "Terminal 5", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Mid-sized venue hosting similar acts." } }
-    ],
-    "Chicago, USA": [
-      { "id": "urn:entity:place:mock-metro", "name": "Metro", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Legendary alt-rock venue." } },
-      { "id": "urn:entity:place:mock-thalia-hall", "name": "Thalia Hall", "type": "urn:entity:place", "affinity": 0.9, "explainability": { "why": "Historic theater for indie acts." } },
-      { "id": "urn:entity:place:mock-empty-bottle", "name": "Empty Bottle", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Dive bar favored by underground fans." } },
-      { "id": "urn:entity:place:mock-riviera-theatre", "name": "Riviera Theatre", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Large venue for established alternative bands." } },
-      { "id": "urn:entity:place:mock-reckless-records", "name": "Reckless Records", "type": "urn:entity:place", "affinity": 0.75, "explainability": { "why": "Go-to record shop in Chicago." } }
-    ],
-    "Los Angeles, USA": [
-      { "id": "urn:entity:place:mock-hollywood-bowl", "name": "Hollywood Bowl", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Iconic outdoor venue." } },
-      { "id": "urn:entity:place:mock-the-wiltern", "name": "The Wiltern", "type": "urn:entity:place", "affinity": 0.9, "explainability": { "why": "Classic theater with great acoustics." } },
-      { "id": "urn:entity:place:mock-el-rey-theatre", "name": "El Rey Theatre", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Intimate art deco venue." } },
-      { "id": "urn:entity:place:mock-amoeba-music", "name": "Amoeba Music", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Massive record store." } },
-      { "id": "urn:entity:place:mock-the-roxy", "name": "The Roxy", "type": "urn:entity:place", "affinity": 0.75, "explainability": { "why": "Legendary Sunset Strip club." } }
-    ],
-    "Manchester, UK": [
-      { "id": "urn:entity:place:mock-o2-apollo", "name": "O2 Apollo Manchester", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Major venue for touring bands." } },
-      { "id": "urn:entity:place:mock-albert-hall", "name": "Albert Hall", "type": "urn:entity:place", "affinity": 0.9, "explainability": { "why": "Atmospheric converted chapel." } },
-      { "id": "urn:entity:place:mock-the-ritz", "name": "O2 Ritz", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Historic venue with a bouncy dance floor." } },
-      { "id": "urn:entity:place:mock-piccadilly-records", "name": "Piccadilly Records", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Essential independent record shop." } },
-      { "id": "urn:entity:place:mock-band-on-the-wall", "name": "Band on the Wall", "type": "urn:entity:place", "affinity": 0.75, "explainability": { "why": "Intimate spot with great sound." } }
-    ],
-    "Austin, USA": [
-      { "id": "urn:entity:place:mock-stubbs-bbq", "name": "Stubb's Waller Creek Amphitheater", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Iconic outdoor stage." } },
-      { "id": "urn:entity:place:mock-mohawk", "name": "Mohawk", "type": "urn:entity:place", "affinity": 0.9, "explainability": { "why": "Multi-level venue favored by indie acts." } },
-      { "id": "urn:entity:place:mock-emo-s", "name": "Emo's", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Staple of the Austin music scene." } },
-      { "id": "urn:entity:place:mock-waterloo-records", "name": "Waterloo Records", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Famous local record store." } },
-      { "id": "urn:entity:place:mock-the-parish", "name": "The Parish", "type": "urn:entity:place", "affinity": 0.75, "explainability": { "why": "Known for excellent acoustics." } }
-    ],
-    "Seattle, USA": [
-      { "id": "urn:entity:place:mock-the-showbox", "name": "The Showbox", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Historic venue in downtown." } },
-      { "id": "urn:entity:place:mock-neumos", "name": "Neumos", "type": "urn:entity:place", "affinity": 0.9, "explainability": { "why": "Mid-sized venue in Capitol Hill." } },
-      { "id": "urn:entity:place:mock-the-crocodile", "name": "The Crocodile", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Legendary grunge-era club." } },
-      { "id": "urn:entity:place:mock-easy-street-records", "name": "Easy Street Records", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Record store with a cafe." } },
-      { "id": "urn:entity:place:mock-tractor-tavern", "name": "Tractor Tavern", "type": "urn:entity:place", "affinity": 0.75, "explainability": { "why": "Cozy spot for roots and indie music." } }
-    ],
-    "Bristol, UK": [
-      { "id": "urn:entity:place:mock-o2-academy-bristol", "name": "O2 Academy Bristol", "type": "urn:entity:place", "affinity": 0.95, "explainability": { "why": "Main stop for touring acts." } },
-      { "id": "urn:entity:place:mock-the-fleece", "name": "The Fleece", "type": "urn:entity:place", "affinity": 0.9, "explainability": { "why": "Classic venue in a historic building." } },
-      { "id": "urn:entity:place:mock-motion", "name": "Motion", "type": "urn:entity:place", "affinity": 0.85, "explainability": { "why": "Large complex, great for electronic and indie crossover." } },
-      { "id": "urn:entity:place:mock-rough-trade-bristol", "name": "Rough Trade Bristol", "type": "urn:entity:place", "affinity": 0.8, "explainability": { "why": "Record store and live space." } },
-      { "id": "urn:entity:place:mock-the-kla", "name": "Thekla", "type": "urn:entity:place", "affinity": 0.75, "explainability": { "why": "Live music venue on a boat." } }
+  "_comment": "Hand-written FAKE fixtures. Not real Qloo API responses. Shapes mirror the documented GET /search, GET /v2/tags and GET /v2/insights responses.",
+  "seedEntityId": "mock-artist-radiohead",
+  "search": {
+    "success": true,
+    "duration": 12,
+    "results": [
+      {
+        "entity_id": "mock-artist-radiohead",
+        "name": "Radiohead",
+        "types": [
+          "urn:entity:artist"
+        ],
+        "popularity": 0.99,
+        "properties": {
+          "short_description": "English rock band (fixture)."
+        },
+        "tags": [
+          {
+            "tag_id": "urn:tag:genre:music:alternative_rock",
+            "name": "Alternative Rock",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:alternative_rock"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:art_rock",
+            "name": "Art Rock",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:art_rock"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:indie_rock",
+            "name": "Indie Rock",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:indie_rock"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:electronic",
+            "name": "Electronic",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:electronic"
+          }
+        ]
+      },
+      {
+        "entity_id": "mock-artist-the-strokes",
+        "name": "The Strokes",
+        "types": [
+          "urn:entity:artist"
+        ],
+        "popularity": 0.95,
+        "properties": {
+          "short_description": "New York rock band (fixture)."
+        },
+        "tags": [
+          {
+            "tag_id": "urn:tag:genre:music:indie_rock",
+            "name": "Indie Rock",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:indie_rock"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:garage_rock",
+            "name": "Garage Rock",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:garage_rock"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:post_punk_revival",
+            "name": "Post-Punk Revival",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:post_punk_revival"
+          }
+        ]
+      },
+      {
+        "entity_id": "mock-artist-big-thief",
+        "name": "Big Thief",
+        "types": [
+          "urn:entity:artist"
+        ],
+        "popularity": 0.86,
+        "properties": {
+          "short_description": "Brooklyn indie band (fixture)."
+        },
+        "tags": [
+          {
+            "tag_id": "urn:tag:genre:music:indie_folk",
+            "name": "Indie Folk",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:indie_folk"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:indie_rock",
+            "name": "Indie Rock",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:indie_rock"
+          }
+        ]
+      },
+      {
+        "entity_id": "mock-artist-khruangbin",
+        "name": "Khruangbin",
+        "types": [
+          "urn:entity:artist"
+        ],
+        "popularity": 0.9,
+        "properties": {
+          "short_description": "Texas trio (fixture)."
+        },
+        "tags": [
+          {
+            "tag_id": "urn:tag:genre:music:psychedelic",
+            "name": "Psychedelic",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:psychedelic"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:funk",
+            "name": "Funk",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:funk"
+          },
+          {
+            "tag_id": "urn:tag:genre:music:indie_rock",
+            "name": "Indie Rock",
+            "type": "urn:tag:genre:music",
+            "value": "urn:tag:genre:music:indie_rock"
+          }
+        ]
+      }
     ]
   },
-  "cross_domain": [
-    { "id": "urn:entity:brand:mock-doc-martens", "name": "Dr. Martens", "type": "urn:entity:brand", "affinity": 0.88 },
-    { "id": "urn:entity:movie:mock-donnie-darko", "name": "Donnie Darko", "type": "urn:entity:movie", "affinity": 0.85 },
-    { "id": "urn:entity:brand:mock-fender", "name": "Fender", "type": "urn:entity:brand", "affinity": 0.92 }
-  ]
+  "tags": {
+    "success": true,
+    "duration": 8,
+    "results": {
+      "tags": [
+        {
+          "id": "urn:tag:genre:music:indie_rock",
+          "name": "Indie Rock",
+          "types": [
+            "urn:entity:artist"
+          ],
+          "parents": [
+            {
+              "id": "urn:tag:genre:music",
+              "name": "Music Genre",
+              "type": "urn:tag:genre"
+            }
+          ]
+        },
+        {
+          "id": "urn:tag:genre:music:alternative_rock",
+          "name": "Alternative Rock",
+          "types": [
+            "urn:entity:artist"
+          ],
+          "parents": [
+            {
+              "id": "urn:tag:genre:music",
+              "name": "Music Genre",
+              "type": "urn:tag:genre"
+            }
+          ]
+        },
+        {
+          "id": "urn:tag:genre:music:art_rock",
+          "name": "Art Rock",
+          "types": [
+            "urn:entity:artist"
+          ],
+          "parents": [
+            {
+              "id": "urn:tag:genre:music",
+              "name": "Music Genre",
+              "type": "urn:tag:genre"
+            }
+          ]
+        },
+        {
+          "id": "urn:tag:genre:music:electronic",
+          "name": "Electronic",
+          "types": [
+            "urn:entity:artist"
+          ],
+          "parents": [
+            {
+              "id": "urn:tag:genre:music",
+              "name": "Music Genre",
+              "type": "urn:tag:genre"
+            }
+          ]
+        },
+        {
+          "id": "urn:tag:genre:music:trip_hop",
+          "name": "Trip Hop",
+          "types": [
+            "urn:entity:artist"
+          ],
+          "parents": [
+            {
+              "id": "urn:tag:genre:music",
+              "name": "Music Genre",
+              "type": "urn:tag:genre"
+            }
+          ]
+        },
+        {
+          "id": "urn:tag:genre:music:post_punk_revival",
+          "name": "Post-Punk Revival",
+          "types": [
+            "urn:entity:artist"
+          ],
+          "parents": [
+            {
+              "id": "urn:tag:genre:music",
+              "name": "Music Genre",
+              "type": "urn:tag:genre"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "insights": {
+    "artist": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "mock-artist-thom-yorke",
+            "name": "Thom Yorke",
+            "type": "urn:entity",
+            "subtype": "urn:entity:artist",
+            "popularity": 0.88,
+            "query": {
+              "affinity": 0.95
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:electronic",
+                "name": "Electronic",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:electronic"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:art_rock",
+                "name": "Art Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:art_rock"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-artist-portishead",
+            "name": "Portishead",
+            "type": "urn:entity",
+            "subtype": "urn:entity:artist",
+            "popularity": 0.84,
+            "query": {
+              "affinity": 0.9
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:trip_hop",
+                "name": "Trip Hop",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:trip_hop"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:electronic",
+                "name": "Electronic",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:electronic"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-artist-interpol",
+            "name": "Interpol",
+            "type": "urn:entity",
+            "subtype": "urn:entity:artist",
+            "popularity": 0.87,
+            "query": {
+              "affinity": 0.86
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:post_punk_revival",
+                "name": "Post-Punk Revival",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:post_punk_revival"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-artist-yeah-yeah-yeahs",
+            "name": "Yeah Yeah Yeahs",
+            "type": "urn:entity",
+            "subtype": "urn:entity:artist",
+            "popularity": 0.83,
+            "query": {
+              "affinity": 0.82
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:garage_rock",
+                "name": "Garage Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:garage_rock"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-artist-arcade-fire",
+            "name": "Arcade Fire",
+            "type": "urn:entity",
+            "subtype": "urn:entity:artist",
+            "popularity": 0.89,
+            "query": {
+              "affinity": 0.78
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:art_rock",
+                "name": "Art Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:art_rock"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-artist-muse",
+            "name": "Muse",
+            "type": "urn:entity",
+            "subtype": "urn:entity:artist",
+            "popularity": 0.93,
+            "query": {
+              "affinity": 0.74
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:alternative_rock",
+                "name": "Alternative Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:alternative_rock"
+              }
+            ]
+          }
+        ]
+      },
+      "query": {
+        "filter.type": "urn:entity:artist"
+      },
+      "duration": 41
+    },
+    "destination": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "mock-destination-london-uk",
+            "name": "London, UK",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 51.5074,
+              "lon": -0.1278
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "London"
+              }
+            },
+            "query": {
+              "affinity": 0.96,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.62
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.21
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.11
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.06
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:alternative_rock",
+                "name": "Alternative Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:alternative_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:art_rock",
+                "name": "Art Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:art_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:electronic",
+                "name": "Electronic",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:electronic"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-destination-manchester-uk",
+            "name": "Manchester, UK",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 53.4808,
+              "lon": -2.2426
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "Manchester"
+              }
+            },
+            "query": {
+              "affinity": 0.93,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.48
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.12
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.08
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.32
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:post_punk_revival",
+                "name": "Post-Punk Revival",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:post_punk_revival"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-destination-bristol-uk",
+            "name": "Bristol, UK",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 51.4545,
+              "lon": -2.5879
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "Bristol"
+              }
+            },
+            "query": {
+              "affinity": 0.89,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.41
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.09
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.44
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.06
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:trip_hop",
+                "name": "Trip Hop",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:trip_hop"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:electronic",
+                "name": "Electronic",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:electronic"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-destination-new-york-usa",
+            "name": "New York, USA",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 40.7128,
+              "lon": -74.006
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "New York"
+              }
+            },
+            "query": {
+              "affinity": 0.91,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.45
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.1
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.07
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.38
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:post_punk_revival",
+                "name": "Post-Punk Revival",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:post_punk_revival"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-destination-chicago-usa",
+            "name": "Chicago, USA",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 41.8781,
+              "lon": -87.6298
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "Chicago"
+              }
+            },
+            "query": {
+              "affinity": 0.84,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.55
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.15
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.1
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.2
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:alternative_rock",
+                "name": "Alternative Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:alternative_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-destination-los-angeles-usa",
+            "name": "Los Angeles, USA",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 34.0522,
+              "lon": -118.2437
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "Los Angeles"
+              }
+            },
+            "query": {
+              "affinity": 0.86,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.5
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.3
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.12
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.08
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:electronic",
+                "name": "Electronic",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:electronic"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:art_rock",
+                "name": "Art Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:art_rock"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-destination-austin-usa",
+            "name": "Austin, USA",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 30.2672,
+              "lon": -97.7431
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "Austin"
+              }
+            },
+            "query": {
+              "affinity": 0.82,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.58
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.08
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.06
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.28
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:psychedelic",
+                "name": "Psychedelic",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:psychedelic"
+              }
+            ]
+          },
+          {
+            "entity_id": "mock-destination-seattle-usa",
+            "name": "Seattle, USA",
+            "type": "urn:entity",
+            "subtype": "urn:entity:destination",
+            "location": {
+              "lat": 47.6062,
+              "lon": -122.3321
+            },
+            "popularity": 0.9,
+            "properties": {
+              "geocode": {
+                "name": "Seattle"
+              }
+            },
+            "query": {
+              "affinity": 0.8,
+              "explainability": {
+                "signal.interests.entities": [
+                  {
+                    "entity_id": "mock-artist-radiohead",
+                    "score": 0.6
+                  },
+                  {
+                    "entity_id": "mock-artist-thom-yorke",
+                    "score": 0.18
+                  },
+                  {
+                    "entity_id": "mock-artist-portishead",
+                    "score": 0.14
+                  },
+                  {
+                    "entity_id": "mock-artist-interpol",
+                    "score": 0.08
+                  }
+                ]
+              }
+            },
+            "tags": [
+              {
+                "tag_id": "urn:tag:genre:music:alternative_rock",
+                "name": "Alternative Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:alternative_rock"
+              },
+              {
+                "tag_id": "urn:tag:genre:music:indie_rock",
+                "name": "Indie Rock",
+                "type": "urn:tag:genre:music",
+                "value": "urn:tag:genre:music:indie_rock"
+              }
+            ]
+          }
+        ]
+      },
+      "query": {
+        "filter.type": "urn:entity:destination"
+      },
+      "duration": 41
+    },
+    "place": {
+      "London, UK": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-london-uk-o2-academy-brixton",
+              "name": "O2 Academy Brixton",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.4874,
+                "lon": -0.1518
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, London (fixture)",
+                "geocode": {
+                  "name": "London"
+                }
+              },
+              "query": {
+                "affinity": 0.95,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.58
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.12
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-london-uk-roundhouse",
+              "name": "Roundhouse",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.4974,
+                "lon": -0.1398
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, London (fixture)",
+                "geocode": {
+                  "name": "London"
+                }
+              },
+              "query": {
+                "affinity": 0.92,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.31
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.12
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.07
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:art_rock",
+                  "name": "Art Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:art_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-london-uk-electric-ballroom",
+              "name": "Electric Ballroom",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.5074,
+                "lon": -0.1278
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, London (fixture)",
+                "geocode": {
+                  "name": "London"
+                }
+              },
+              "query": {
+                "affinity": 0.88,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.46
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.08
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.06
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.4
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:post_punk_revival",
+                  "name": "Post-Punk Revival",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:post_punk_revival"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-london-uk-rough-trade-east",
+              "name": "Rough Trade East",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.5174,
+                "lon": -0.1158
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, London (fixture)",
+                "geocode": {
+                  "name": "London"
+                }
+              },
+              "query": {
+                "affinity": 0.84,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.4
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.22
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.28
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-london-uk-the-lexington",
+              "name": "The Lexington",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.5274,
+                "lon": -0.1038
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, London (fixture)",
+                "geocode": {
+                  "name": "London"
+                }
+              },
+              "query": {
+                "affinity": 0.79,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.36
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.44
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      },
+      "Manchester, UK": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-manchester-uk-albert-hall",
+              "name": "Albert Hall",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 53.4608,
+                "lon": -2.2666
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, Manchester (fixture)",
+                "geocode": {
+                  "name": "Manchester"
+                }
+              },
+              "query": {
+                "affinity": 0.93,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.55
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.25
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:art_rock",
+                  "name": "Art Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:art_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-manchester-uk-o2-ritz",
+              "name": "O2 Ritz",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 53.4708,
+                "lon": -2.2546
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, Manchester (fixture)",
+                "geocode": {
+                  "name": "Manchester"
+                }
+              },
+              "query": {
+                "affinity": 0.89,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.44
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.06
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.05
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.45
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:post_punk_revival",
+                  "name": "Post-Punk Revival",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:post_punk_revival"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-manchester-uk-band-on-the-wall",
+              "name": "Band on the Wall",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 53.4808,
+                "lon": -2.2426
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, Manchester (fixture)",
+                "geocode": {
+                  "name": "Manchester"
+                }
+              },
+              "query": {
+                "affinity": 0.85,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.4
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.3
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-manchester-uk-piccadilly-records",
+              "name": "Piccadilly Records",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 53.4908,
+                "lon": -2.2306
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, Manchester (fixture)",
+                "geocode": {
+                  "name": "Manchester"
+                }
+              },
+              "query": {
+                "affinity": 0.82,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.2
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-manchester-uk-yes",
+              "name": "YES",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 53.5008,
+                "lon": -2.2186
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, Manchester (fixture)",
+                "geocode": {
+                  "name": "Manchester"
+                }
+              },
+              "query": {
+                "affinity": 0.77,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.38
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.12
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.4
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      },
+      "Bristol, UK": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-bristol-uk-swx",
+              "name": "SWX",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.4345,
+                "lon": -2.6119
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, Bristol (fixture)",
+                "geocode": {
+                  "name": "Bristol"
+                }
+              },
+              "query": {
+                "affinity": 0.9,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.45
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.4
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.05
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:trip_hop",
+                  "name": "Trip Hop",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:trip_hop"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-bristol-uk-the-fleece",
+              "name": "The Fleece",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.4445,
+                "lon": -2.5999
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, Bristol (fixture)",
+                "geocode": {
+                  "name": "Bristol"
+                }
+              },
+              "query": {
+                "affinity": 0.88,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.52
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.08
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.3
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-bristol-uk-thekla",
+              "name": "Thekla",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.4545,
+                "lon": -2.5879
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, Bristol (fixture)",
+                "geocode": {
+                  "name": "Bristol"
+                }
+              },
+              "query": {
+                "affinity": 0.84,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.38
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.12
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.42
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.08
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:trip_hop",
+                  "name": "Trip Hop",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:trip_hop"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-bristol-uk-rough-trade-bristol",
+              "name": "Rough Trade Bristol",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.4645,
+                "lon": -2.5759
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, Bristol (fixture)",
+                "geocode": {
+                  "name": "Bristol"
+                }
+              },
+              "query": {
+                "affinity": 0.8,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.42
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.3
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.08
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-bristol-uk-the-louisiana",
+              "name": "The Louisiana",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 51.4745,
+                "lon": -2.5639
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, Bristol (fixture)",
+                "geocode": {
+                  "name": "Bristol"
+                }
+              },
+              "query": {
+                "affinity": 0.75,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.3
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      },
+      "New York, USA": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-new-york-usa-brooklyn-steel",
+              "name": "Brooklyn Steel",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 40.6928,
+                "lon": -74.03
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, New York (fixture)",
+                "geocode": {
+                  "name": "New York"
+                }
+              },
+              "query": {
+                "affinity": 0.94,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.12
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.06
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.32
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-new-york-usa-bowery-ballroom",
+              "name": "Bowery Ballroom",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 40.7028,
+                "lon": -74.018
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, New York (fixture)",
+                "geocode": {
+                  "name": "New York"
+                }
+              },
+              "query": {
+                "affinity": 0.9,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.4
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.05
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.45
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:post_punk_revival",
+                  "name": "Post-Punk Revival",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:post_punk_revival"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-new-york-usa-elsewhere",
+              "name": "Elsewhere",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 40.7128,
+                "lon": -74.006
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, New York (fixture)",
+                "geocode": {
+                  "name": "New York"
+                }
+              },
+              "query": {
+                "affinity": 0.86,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.42
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.36
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.14
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.08
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:art_rock",
+                  "name": "Art Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:art_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-new-york-usa-rough-trade-nyc",
+              "name": "Rough Trade NYC",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 40.7228,
+                "lon": -73.994
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, New York (fixture)",
+                "geocode": {
+                  "name": "New York"
+                }
+              },
+              "query": {
+                "affinity": 0.82,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.48
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.12
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.2
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-new-york-usa-union-pool",
+              "name": "Union Pool",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 40.7328,
+                "lon": -73.982
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, New York (fixture)",
+                "geocode": {
+                  "name": "New York"
+                }
+              },
+              "query": {
+                "affinity": 0.76,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.36
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.44
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:garage_rock",
+                  "name": "Garage Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:garage_rock"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      },
+      "Chicago, USA": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-chicago-usa-metro",
+              "name": "Metro",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 41.8581,
+                "lon": -87.6538
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, Chicago (fixture)",
+                "geocode": {
+                  "name": "Chicago"
+                }
+              },
+              "query": {
+                "affinity": 0.92,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.6
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.15
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-chicago-usa-thalia-hall",
+              "name": "Thalia Hall",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 41.8681,
+                "lon": -87.6418
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, Chicago (fixture)",
+                "geocode": {
+                  "name": "Chicago"
+                }
+              },
+              "query": {
+                "affinity": 0.88,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.25
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:art_rock",
+                  "name": "Art Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:art_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-chicago-usa-empty-bottle",
+              "name": "Empty Bottle",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 41.8781,
+                "lon": -87.6298
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, Chicago (fixture)",
+                "geocode": {
+                  "name": "Chicago"
+                }
+              },
+              "query": {
+                "affinity": 0.85,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.44
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.08
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.08
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.4
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:garage_rock",
+                  "name": "Garage Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:garage_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-chicago-usa-reckless-records",
+              "name": "Reckless Records",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 41.8881,
+                "lon": -87.6178
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, Chicago (fixture)",
+                "geocode": {
+                  "name": "Chicago"
+                }
+              },
+              "query": {
+                "affinity": 0.8,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-chicago-usa-the-hideout",
+              "name": "The Hideout",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 41.8981,
+                "lon": -87.6058
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, Chicago (fixture)",
+                "geocode": {
+                  "name": "Chicago"
+                }
+              },
+              "query": {
+                "affinity": 0.74,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.45
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.35
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      },
+      "Los Angeles, USA": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-los-angeles-usa-the-wiltern",
+              "name": "The Wiltern",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 34.0322,
+                "lon": -118.2677
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, Los Angeles (fixture)",
+                "geocode": {
+                  "name": "Los Angeles"
+                }
+              },
+              "query": {
+                "affinity": 0.93,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.55
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.3
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.05
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:art_rock",
+                  "name": "Art Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:art_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-los-angeles-usa-the-echo",
+              "name": "The Echo",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 34.0422,
+                "lon": -118.2557
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, Los Angeles (fixture)",
+                "geocode": {
+                  "name": "Los Angeles"
+                }
+              },
+              "query": {
+                "affinity": 0.88,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.4
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.35
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-los-angeles-usa-the-fonda-theatre",
+              "name": "The Fonda Theatre",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 34.0522,
+                "lon": -118.2437
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, Los Angeles (fixture)",
+                "geocode": {
+                  "name": "Los Angeles"
+                }
+              },
+              "query": {
+                "affinity": 0.85,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.25
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:art_rock",
+                  "name": "Art Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:art_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-los-angeles-usa-amoeba-music",
+              "name": "Amoeba Music",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 34.0622,
+                "lon": -118.2317
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, Los Angeles (fixture)",
+                "geocode": {
+                  "name": "Los Angeles"
+                }
+              },
+              "query": {
+                "affinity": 0.83,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.45
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.25
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-los-angeles-usa-zebulon",
+              "name": "Zebulon",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 34.0722,
+                "lon": -118.2197
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, Los Angeles (fixture)",
+                "geocode": {
+                  "name": "Los Angeles"
+                }
+              },
+              "query": {
+                "affinity": 0.77,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.35
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.35
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:electronic",
+                  "name": "Electronic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:electronic"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      },
+      "Austin, USA": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-austin-usa-mohawk",
+              "name": "Mohawk",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 30.2472,
+                "lon": -97.7671
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, Austin (fixture)",
+                "geocode": {
+                  "name": "Austin"
+                }
+              },
+              "query": {
+                "affinity": 0.92,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.05
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.35
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-austin-usa-stubbs",
+              "name": "Stubbs",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 30.2572,
+                "lon": -97.7551
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, Austin (fixture)",
+                "geocode": {
+                  "name": "Austin"
+                }
+              },
+              "query": {
+                "affinity": 0.9,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.6
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.15
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-austin-usa-the-parish",
+              "name": "The Parish",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 30.2672,
+                "lon": -97.7431
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, Austin (fixture)",
+                "geocode": {
+                  "name": "Austin"
+                }
+              },
+              "query": {
+                "affinity": 0.85,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.45
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.15
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:psychedelic",
+                  "name": "Psychedelic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:psychedelic"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-austin-usa-waterloo-records",
+              "name": "Waterloo Records",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 30.2772,
+                "lon": -97.7311
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, Austin (fixture)",
+                "geocode": {
+                  "name": "Austin"
+                }
+              },
+              "query": {
+                "affinity": 0.82,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.2
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-austin-usa-hotel-vegas",
+              "name": "Hotel Vegas",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 30.2872,
+                "lon": -97.7191
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, Austin (fixture)",
+                "geocode": {
+                  "name": "Austin"
+                }
+              },
+              "query": {
+                "affinity": 0.76,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.35
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.45
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:garage_rock",
+                  "name": "Garage Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:garage_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:psychedelic",
+                  "name": "Psychedelic",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:psychedelic"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      },
+      "Seattle, USA": {
+        "success": true,
+        "results": {
+          "entities": [
+            {
+              "entity_id": "mock-place-seattle-usa-the-showbox",
+              "name": "The Showbox",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 47.5862,
+                "lon": -122.3561
+              },
+              "popularity": 0.9,
+              "properties": {
+                "address": "10 Example Street, Seattle (fixture)",
+                "geocode": {
+                  "name": "Seattle"
+                }
+              },
+              "query": {
+                "affinity": 0.93,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.6
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.15
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-seattle-usa-neumos",
+              "name": "Neumos",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 47.5962,
+                "lon": -122.3441
+              },
+              "popularity": 0.85,
+              "properties": {
+                "address": "17 Example Street, Seattle (fixture)",
+                "geocode": {
+                  "name": "Seattle"
+                }
+              },
+              "query": {
+                "affinity": 0.89,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.45
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.15
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.3
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-seattle-usa-the-crocodile",
+              "name": "The Crocodile",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 47.6062,
+                "lon": -122.3321
+              },
+              "popularity": 0.8,
+              "properties": {
+                "address": "24 Example Street, Seattle (fixture)",
+                "geocode": {
+                  "name": "Seattle"
+                }
+              },
+              "query": {
+                "affinity": 0.86,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.55
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.25
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:live_music_venue",
+                  "name": "Live Music Venue",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:live_music_venue"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:alternative_rock",
+                  "name": "Alternative Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:alternative_rock"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-seattle-usa-easy-street-records",
+              "name": "Easy Street Records",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 47.6162,
+                "lon": -122.3201
+              },
+              "popularity": 0.75,
+              "properties": {
+                "address": "31 Example Street, Seattle (fixture)",
+                "geocode": {
+                  "name": "Seattle"
+                }
+              },
+              "query": {
+                "affinity": 0.81,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.5
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.1
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:record_store",
+                  "name": "Record Store",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:record_store"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_rock",
+                  "name": "Indie Rock",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_rock"
+                }
+              ]
+            },
+            {
+              "entity_id": "mock-place-seattle-usa-tractor-tavern",
+              "name": "Tractor Tavern",
+              "type": "urn:entity",
+              "subtype": "urn:entity:place",
+              "location": {
+                "lat": 47.6262,
+                "lon": -122.3081
+              },
+              "popularity": 0.7,
+              "properties": {
+                "address": "38 Example Street, Seattle (fixture)",
+                "geocode": {
+                  "name": "Seattle"
+                }
+              },
+              "query": {
+                "affinity": 0.75,
+                "explainability": {
+                  "signal.interests.entities": [
+                    {
+                      "entity_id": "mock-artist-radiohead",
+                      "score": 0.4
+                    },
+                    {
+                      "entity_id": "mock-artist-thom-yorke",
+                      "score": 0.1
+                    },
+                    {
+                      "entity_id": "mock-artist-portishead",
+                      "score": 0.2
+                    },
+                    {
+                      "entity_id": "mock-artist-interpol",
+                      "score": 0.3
+                    }
+                  ]
+                }
+              },
+              "tags": [
+                {
+                  "tag_id": "urn:tag:category:place:bar",
+                  "name": "Bar",
+                  "type": "urn:tag:category:place",
+                  "value": "urn:tag:category:place:bar"
+                },
+                {
+                  "tag_id": "urn:tag:genre:music:indie_folk",
+                  "name": "Indie Folk",
+                  "type": "urn:tag:genre:music",
+                  "value": "urn:tag:genre:music:indie_folk"
+                }
+              ]
+            }
+          ]
+        },
+        "query": {
+          "filter.type": "urn:entity:place"
+        },
+        "duration": 41
+      }
+    },
+    "brand": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "mock-brand-dr-martens",
+            "name": "Dr. Martens",
+            "type": "urn:entity",
+            "subtype": "urn:entity:brand",
+            "popularity": 0.8,
+            "query": {
+              "affinity": 0.88
+            },
+            "tags": []
+          },
+          {
+            "entity_id": "mock-brand-fender",
+            "name": "Fender",
+            "type": "urn:entity",
+            "subtype": "urn:entity:brand",
+            "popularity": 0.8,
+            "query": {
+              "affinity": 0.86
+            },
+            "tags": []
+          },
+          {
+            "entity_id": "mock-brand-moog",
+            "name": "Moog",
+            "type": "urn:entity",
+            "subtype": "urn:entity:brand",
+            "popularity": 0.8,
+            "query": {
+              "affinity": 0.81
+            },
+            "tags": []
+          }
+        ]
+      },
+      "query": {
+        "filter.type": "urn:entity:brand"
+      },
+      "duration": 41
+    },
+    "movie": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "mock-movie-donnie-darko",
+            "name": "Donnie Darko",
+            "type": "urn:entity",
+            "subtype": "urn:entity:movie",
+            "popularity": 0.8,
+            "query": {
+              "affinity": 0.85
+            },
+            "tags": []
+          },
+          {
+            "entity_id": "mock-movie-children-of-men",
+            "name": "Children of Men",
+            "type": "urn:entity",
+            "subtype": "urn:entity:movie",
+            "popularity": 0.8,
+            "query": {
+              "affinity": 0.83
+            },
+            "tags": []
+          },
+          {
+            "entity_id": "mock-movie-ex-machina",
+            "name": "Ex Machina",
+            "type": "urn:entity",
+            "subtype": "urn:entity:movie",
+            "popularity": 0.8,
+            "query": {
+              "affinity": 0.8
+            },
+            "tags": []
+          }
+        ]
+      },
+      "query": {
+        "filter.type": "urn:entity:movie"
+      },
+      "duration": 41
+    }
+  }
 }
