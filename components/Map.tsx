@@ -1,52 +1,65 @@
 'use client'
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { useEffect } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
-// Fix for default icon in react-leaflet
-delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-})
-
-export interface Venue {
-  name: string
-  affinity?: number
-  why?: string
-}
-
-export interface Stop {
-  name: string
+export interface MapStop {
+  city: string
   lat?: number
   lng?: number
-  why?: string
-  venues?: Venue[]
-  coBills?: string[]
-  merch?: string[]
+  affinity?: number
 }
 
-export default function Map({ stops }: { stops: Stop[] }) {
-  if (stops.length === 0) return null
+type Located = MapStop & { lat: number; lng: number }
 
-  const center = stops[0]
+const markerIcon = (n: number) =>
+  L.divIcon({
+    className: '',
+    html: `<span class="gr-marker">${n}</span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
+  })
+
+function FitBounds({ points }: { points: [number, number][] }) {
+  const map = useMap()
+  const key = JSON.stringify(points)
+  useEffect(() => {
+    if (points.length === 1) map.setView(points[0], 8)
+    else if (points.length > 1) map.fitBounds(points, { padding: [40, 40] })
+    // `key` captures the coordinates; re-fit only when they change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, key])
+  return null
+}
+
+export default function Map({ stops, routed }: { stops: MapStop[]; routed: boolean }) {
+  const located = stops
+    .map((s, i) => ({ ...s, n: i + 1 }))
+    .filter((s): s is Located & { n: number } => s.lat != null && s.lng != null)
+  const points = located.map((s) => [s.lat, s.lng] as [number, number])
 
   return (
-    <MapContainer center={[center.lat || 51.505, center.lng || -0.09]} zoom={6} className="h-full w-full rounded-lg shadow-lg">
+    <MapContainer center={points[0] ?? [51.5, -0.12]} zoom={5} scrollWheelZoom={false} className="h-full w-full">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {stops.map((stop, i) => (
-        stop.lat != null && stop.lng != null ? (
-          <Marker key={i} position={[stop.lat, stop.lng]}>
-            <Popup>
-              <strong>{i + 1}. {stop.name}</strong>
-            </Popup>
-          </Marker>
-        ) : null
+      <FitBounds points={points} />
+      {routed && points.length > 1 && (
+        <Polyline positions={points} pathOptions={{ color: '#fbbf24', weight: 3, dashArray: '6 8' }} />
+      )}
+      {located.map((s) => (
+        <Marker key={`${s.city}-${s.n}`} position={[s.lat, s.lng]} icon={markerIcon(s.n)} title={`${s.n}. ${s.city}`}>
+          <Popup>
+            <strong>
+              {s.n}. {s.city}
+            </strong>
+            {s.affinity != null && <div>Affinity {Math.round(s.affinity * 100)}%</div>}
+          </Popup>
+        </Marker>
       ))}
     </MapContainer>
   )
