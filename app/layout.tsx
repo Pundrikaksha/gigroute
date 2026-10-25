@@ -12,10 +12,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "GigRoute: taste-grounded tour planning";
+const description =
+  "Route your next tour to where your fans already are. GigRoute uses Qloo taste data to pick cities, venues and co-bills, and explains why.";
+
 export const metadata: Metadata = {
-  title: "GigRoute: taste-grounded tour planning",
-  description:
-    "Route your next tour to where your fans already are. GigRoute uses Qloo taste data to pick cities, venues and co-bills, and explains why.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://gigroute.vercel.app"),
+  title,
+  description,
+  applicationName: "GigRoute",
+  openGraph: {
+    type: "website",
+    siteName: "GigRoute",
+    url: "/",
+    title,
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export const viewport: Viewport = {
