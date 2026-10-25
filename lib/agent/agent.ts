@@ -2,7 +2,7 @@ import 'server-only'
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 import { getLLMClient } from './llm'
 import { tools, executeTool, type ToolArgs } from './tools'
-import { getQlooClient } from '../qloo'
+import { getQlooClient, type QlooClient } from '../qloo'
 import { applyToolResult, createPlan, type Plan, type PlanInput } from './plan'
 
 const MAX_LLM_CALLS = 12
@@ -30,6 +30,8 @@ export interface AgentOptions {
   mock?: boolean
   /** Pause between steps so streaming is visible in instant mock runs. */
   stepDelayMs?: number
+  /** Override the Qloo client (tests). */
+  qloo?: QlooClient
 }
 
 const STEP_LABELS: Record<string, (args: ToolArgs) => string> = {
@@ -42,11 +44,14 @@ const STEP_LABELS: Record<string, (args: ToolArgs) => string> = {
   draft_pitch: (a) => `Drafting a pitch for ${a.venue_name}`,
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+// Results the UI only shows once planning is done; the `done` event carries their plan.
+const FINAL_ONLY_TOOLS = new Set(['draft_pitch'])
+
+const sleep =(ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export async function runAgent(input: PlanInput, onEvent: (event: AgentEvent) => void, options: AgentOptions = {}) {
   const llm = getLLMClient({ forceMock: options.mock })
-  const qloo = getQlooClient({ forceMock: options.mock })
+  const qloo = options.qloo ?? getQlooClient({ forceMock: options.mock })
   const messages: ChatCompletionMessageParam[] = [
     { role: 'system', content: SYSTEM_PROMPT },
     { role: 'user', content: JSON.stringify(input) },
@@ -94,8 +99,14 @@ export async function runAgent(input: PlanInput, onEvent: (event: AgentEvent) =>
       }
       messages.push({ role: 'tool', tool_call_id: toolCall.id, content: JSON.stringify(result) })
       plan = applyToolResult(plan, name, args as Record<string, unknown>, result)
-      onEvent({ step: `${name}_result`, text: `Done: ${STEP_LABELS[name]?.(args) ?? name}`, partial: result, plan })
+      // The raw result is already folded into the plan, so it is not repeated on the wire, and
+      // parallel results in one batch share a single plan snapshot on the last event.
+      const event: AgentEvent = { step: `${name}_result`, text: `Done: ${STEP_LABELS[name]?.(args) ?? name}` }
+      if (i === outcomes.length - 1 && !FINAL_ONLY_TOOLS.has(name)) event.plan = plan
+      onEvent(event)
     }
+    // If the batch ended on a failed call, still publish the latest plan.
+    if (outcomes[outcomes.length - 1]?.status === 'rejected') onEvent({ step: 'plan', text: 'Plan updated.', plan })
 
     if (options.stepDelayMs) await sleep(options.stepDelayMs)
   }

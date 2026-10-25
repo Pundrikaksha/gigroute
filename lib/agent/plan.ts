@@ -26,7 +26,8 @@ export interface PlanStop {
 
 export interface Plan {
   input: PlanInput
-  artist?: { id: string; name: string; tags: QlooTag[] }
+  /** sampleOf is set in mock mode when an unknown artist was mapped onto a fixture profile. */
+  artist?: { id: string; name: string; tags: QlooTag[]; sampleOf?: string }
   artistNotFound?: boolean
   candidates?: { id: string; name: string }[]
   similarArtists: QlooEntity[]
@@ -102,7 +103,9 @@ export function applyToolResult(plan: Plan, tool: string, args: Record<string, u
       }
       if (!isEntityList(result) || result.length === 0) return { ...plan, artistNotFound: true }
       const a = result[0]
-      return { ...plan, artist: { id: a.id, name: a.name, tags: a.tags ?? [] }, artistNotFound: false }
+      const artist: NonNullable<Plan['artist']> = { id: a.id, name: a.name, tags: a.tags ?? [] }
+      if (a.sampleOf) artist.sampleOf = a.sampleOf
+      return { ...plan, artist, artistNotFound: false }
     }
     case 'similar_artists':
       return isEntityList(result) ? { ...plan, similarArtists: result } : plan
@@ -214,20 +217,210 @@ export function draftPitch(venue: string, artist: string, why?: string): string 
   return `Hi ${venue} booking team,\n\nI'm reaching out on behalf of ${artist}.${reason} We're routing a run through your city and would love to discuss a date.\n\nThanks!`
 }
 
-export function planToMarkdown(plan: Plan): string {
-  const pct = (n?: number) => (n == null ? 'n/a' : `${Math.round(n * 100)}%`)
+// ---------------------------------------------------------------------------
+// Narration, pitches and exports. All pure and deterministic, so the MockLLM, the
+// UI and the exports tell the same story from the same Qloo evidence.
+// ---------------------------------------------------------------------------
+
+const pct = (n?: number) => (n == null ? 'n/a' : `${Math.round(n * 100)}%`)
+const shortCity = (city: string) => city.split(',')[0].trim()
+const PLACE_CATEGORY = 'urn:tag:category:place'
+
+/** "a", "a and b", "a, b and c" */
+function list(items: string[]): string {
+  if (items.length <= 1) return items.join('')
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+}
+
+const driverText = (drivers: Driver[], n = 2) => list(drivers.slice(0, n).map((d) => `${d.name} (${pct(d.score)})`))
+
+export interface StopNarrative {
+  city: string
+  text: string
+}
+
+export interface TourNarrative {
+  summary: string
+  stops: StopNarrative[]
+}
+
+function venueKind(venue: QlooEntity): string | undefined {
+  return venue.tags.find((t) => t.type === PLACE_CATEGORY)?.name
+}
+
+function narrateStop(plan: Plan, stop: PlanStop): string {
+  if (stop.affinity == null && (stop.venues ?? []).length === 0) {
+    return `${stop.city}: you asked for this city, but Qloo returned no audience data for it, so treat it as a wildcard date.`
+  }
+  const parts: string[] = []
+  const shared = matchingTags(plan, stop.tags).map((t) => t.name)
+  const drivers = resolveDrivers(plan, stop.explainability)
+  let lead = `${stop.city} (${pct(stop.affinity)} audience affinity)`
+  if (shared.length > 0) lead += ` shares ${list(shared)} with your sound`
+  parts.push(drivers.length > 0 ? `${lead}; the score is driven by fans of ${driverText(drivers)}.` : `${lead}.`)
+  const [top, backup] = stop.venues ?? []
+  if (top) {
+    const tags = matchingTags(plan, top.tags).filter((t) => t.type !== PLACE_CATEGORY).map((t) => t.name)
+    const kind = venueKind(top)
+    parts.push(
+      `Headline room: ${top.name} (${pct(top.affinity)}${kind ? `, ${kind.toLowerCase()}` : ''}${tags.length ? `; tagged ${list(tags)}` : ''}).`
+    )
+  }
+  if (backup) parts.push(`Backup: ${backup.name} (${pct(backup.affinity)}).`)
+  return parts.join(' ')
+}
+
+/** A judge-friendly explanation of why each city and room made the cut, citing Qloo signals. */
+export function narrateTour(plan: Plan): TourNarrative {
+  const name = plan.artist?.name ?? plan.input.artist
+  const stops = plan.stops.map((s) => ({ city: s.city, text: narrateStop(plan, s) }))
+  if (plan.stops.length === 0) return { summary: '', stops }
+
+  const sentences: string[] = []
+  const route = plan.stops.map((s) => shortCity(s.city)).join(' → ')
+  sentences.push(
+    `A ${plan.stops.length}-stop run for ${name}: ${route}. Every city and room was ranked by Qloo audience affinity for ${name}${
+      plan.similarArtists.length > 0 ? ' and its closest similar artists' : ''
+    }, not by guesswork.`
+  )
+  const best = [...plan.stops].sort((a, b) => (b.affinity ?? 0) - (a.affinity ?? 0))[0]
+  if (best.affinity != null) {
+    const drivers = resolveDrivers(plan, best.explainability)
+    sentences.push(
+      `The strongest overlap is ${shortCity(best.city)} at ${pct(best.affinity)}${
+        drivers.length > 0 ? `, driven mostly by fans of ${driverText(drivers)}` : ''
+      }.`
+    )
+  }
+  if (plan.similarArtists.length > 0) {
+    sentences.push(
+      `Co-bill with ${list(plan.similarArtists.slice(0, 2).map((a) => `${a.name} (${pct(a.affinity)})`))} to pull from the same crowd.`
+    )
+  }
+  if (plan.merch.length > 0) {
+    sentences.push(`For posters and merch, this audience over-indexes on ${list(plan.merch.slice(0, 3).map((m) => m.name))}.`)
+  }
+  if (plan.artist?.sampleOf) {
+    sentences.push(
+      `Sample data: ${name} isn't in the built-in fixtures, so this plan uses the ${plan.artist.sampleOf} taste profile.`
+    )
+  }
+  return { summary: sentences.join(' '), stops }
+}
+
+export interface PitchEmail {
+  subject: string
+  body: string
+}
+
+/**
+ * A booking-enquiry draft for one venue, grounded in the plan's Qloo evidence.
+ * Shown on screen to copy; GigRoute never sends email.
+ */
+export function pitchEmail(plan: Plan, stop: PlanStop, venue: QlooEntity): PitchEmail {
+  const artist = plan.artist?.name ?? plan.input.artist
+  const city = shortCity(stop.city)
+  const evidence: string[] = []
+  evidence.push(
+    `Qloo audience data puts ${venue.name} at ${pct(venue.affinity)} affinity with our listeners` +
+      (stop.affinity != null ? `, in a city that scores ${pct(stop.affinity)} overall.` : '.')
+  )
+  const tags = matchingTags(plan, venue.tags).filter((t) => t.type !== PLACE_CATEGORY).map((t) => t.name)
+  if (tags.length > 0) evidence.push(`Shared taste tags: ${list(tags)}.`)
+  const drivers = resolveDrivers(plan, venue.explainability).filter((d) => d.id !== plan.artist?.id)
+  if (drivers.length > 0) evidence.push(`Your regulars also over-index on ${list(drivers.slice(0, 2).map((d) => d.name))}.`)
+  const coBills = plan.similarArtists.slice(0, 2).map((a) => a.name)
+  if (coBills.length > 0) evidence.push(`We're open to sharing the bill with acts like ${list(coBills)}, who draw the same crowd.`)
+
+  const route = plan.stops.length > 1 ? ` (${plan.stops.map((s) => shortCity(s.city)).join(', ')})` : ''
+  const body = [
+    `Hi ${venue.name} booking team,`,
+    `I'm writing on behalf of ${artist}. We're routing a ${plan.stops.length}-city run${route} and ${venue.name} is our first choice in ${city}.`,
+    `Why we think it's a fit:\n${evidence.map((e) => `- ${e}`).join('\n')}`,
+    `We'd love to talk about available dates and your usual terms. Happy to send a press kit, streaming links and recent draw numbers.`,
+    `Thanks,\n[Your name]\n${artist} · [email] · [phone]`,
+    `(Affinity figures are Qloo group-level audience tendencies, not ticket guarantees.)`,
+  ].join('\n\n')
+  return { subject: `Booking enquiry: ${artist} at ${venue.name}, ${city}`, body }
+}
+
+export const pitchText = (p: PitchEmail) => `Subject: ${p.subject}\n\n${p.body}`
+
+/** Relative permalink that re-runs the same plan: every input is in the query string. */
+export function planHref(input: Omit<PlanInput, 'demo'> & { demo?: boolean }): string {
+  const q = new URLSearchParams({ artist: input.artist })
+  if (input.region) q.set('region', input.region)
+  if (input.cities.length > 0) q.set('cities', input.cities.join(', '))
+  q.set('stops', String(input.stops))
+  if (input.demo) q.set('demo', '1')
+  return `/plan?${q}`
+}
+
+export function planFileName(plan: Plan, ext: string): string {
+  const slug = (plan.artist?.name ?? plan.input.artist).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  return `gigroute-${slug || 'tour'}.${ext}`
+}
+
+/** A compact, documented export of the plan (names and scores, not raw API payloads). */
+export function planToJSON(plan: Plan, origin = ''): string {
+  const narrative = narrateTour(plan)
+  const data = {
+    format: 'gigroute-plan@1',
+    permalink: `${origin}${planHref(plan.input)}`,
+    input: plan.input,
+    artist: plan.artist && {
+      name: plan.artist.name,
+      tags: plan.artist.tags.map((t) => t.name),
+      ...(plan.artist.sampleOf ? { sampleProfile: plan.artist.sampleOf } : {}),
+    },
+    summary: narrative.summary,
+    coBills: plan.similarArtists.map((a) => ({ name: a.name, affinity: a.affinity })),
+    stops: plan.stops.map((stop, i) => ({
+      city: stop.city,
+      lat: stop.lat,
+      lng: stop.lng,
+      affinity: stop.affinity,
+      why: narrative.stops[i].text,
+      drivers: resolveDrivers(plan, stop.explainability).map(({ name, score }) => ({ name, score })),
+      venues: (stop.venues ?? []).map((v) => ({
+        name: v.name,
+        address: v.address,
+        affinity: v.affinity,
+        matchingTags: matchingTags(plan, v.tags).map((t) => t.name),
+        pitch: pitchEmail(plan, stop, v),
+      })),
+    })),
+    merch: plan.merch.map((m) => ({ name: m.name, type: m.type })),
+    note: 'Affinities describe group tendencies of audiences, not individual preferences.',
+  }
+  return JSON.stringify(data, null, 2)
+}
+
+export function planToMarkdown(plan: Plan, origin = ''): string {
+  const narrative = narrateTour(plan)
   let md = `# Tour plan for ${plan.artist?.name ?? plan.input.artist}\n\n`
   md += `_Affinities describe group tendencies of audiences, not individual preferences._\n\n`
+  md += `Permalink: ${origin}${planHref(plan.input)}\n\n`
+  if (narrative.summary) md += `${narrative.summary}\n\n`
   if (plan.similarArtists.length > 0) {
     md += `**Co-bill ideas:** ${plan.similarArtists.map((a) => a.name).join(', ')}\n\n`
   }
   plan.stops.forEach((stop, i) => {
-    md += `## Stop ${i + 1}: ${stop.city} (affinity ${pct(stop.affinity)})\n`
+    md += `## Stop ${i + 1}: ${stop.city} (affinity ${pct(stop.affinity)})\n\n`
+    md += `${narrative.stops[i].text}\n\n`
     const drivers = resolveDrivers(plan, stop.explainability)
     if (drivers.length > 0) md += `- Driven by fans of: ${drivers.map((d) => `${d.name} (${pct(d.score)})`).join(', ')}\n`
     for (const v of stop.venues ?? []) {
       const tags = matchingTags(plan, v.tags).map((t) => t.name)
       md += `- ${v.name}: affinity ${pct(v.affinity)}${tags.length ? `; matching tags: ${tags.join(', ')}` : ''}\n`
+    }
+    const top = stop.venues?.[0]
+    if (top) {
+      const pitch = pitchEmail(plan, stop, top)
+      md += `\n### Pitch draft: ${top.name}\n\n**Subject:** ${pitch.subject}\n\n${pitch.body
+        .split('\n')
+        .map((l) => `> ${l}`)
+        .join('\n')}\n`
     }
     md += `\n`
   })

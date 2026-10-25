@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>GigRoute</title>
+  <rect width="64" height="64" rx="14" fill="#09090b"/>
+  <path d="M14 46 L28 30 L38 38 L50 18" fill="none" stroke="#fbbf24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="14" cy="46" r="5" fill="#fbbf24"/>
+  <circle cx="28" cy="30" r="5" fill="#fbbf24"/>
+  <circle cx="38" cy="38" r="5" fill="#fbbf24"/>
+  <circle cx="50" cy="18" r="7" fill="#fcd34d" stroke="#09090b" stroke-width="2"/>
+</svg>

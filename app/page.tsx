@@ -41,6 +41,32 @@ const steps = [
   },
 ]
 
+const qlooUsage = [
+  { call: 'GET /search', use: 'Resolves the artist you type to a Qloo entity ID.' },
+  {
+    call: '/v2/insights · filter.type=urn:entity:artist',
+    use: 'Similar artists, used for co-bill ideas and as extra taste signals.',
+  },
+  {
+    call: '/v2/insights · filter.type=urn:entity:destination',
+    use: 'Fan hotspots: the cities where this taste over-indexes, optionally within a region.',
+  },
+  {
+    call: '/v2/insights · filter.type=urn:entity:place',
+    use: 'Venues, bars and record shops in each city, ranked by audience affinity.',
+  },
+  {
+    call: 'signal.interests.entities',
+    use: 'The artist plus its top similar artists are sent together as the taste signal.',
+  },
+  {
+    call: 'feature.explainability=true',
+    use: 'Shows which of those artists drove each city and venue (“driven by fans of…”).',
+  },
+  { call: 'tags', use: 'Genre and place tags shared with your sound explain each match and fill the pitch emails.' },
+  { call: 'filter.type=urn:entity:brand / movie', use: 'Cross-domain tastes for merch and poster cues.' },
+]
+
 export default function Home() {
   return (
     <main id="main" className="flex-1">
@@ -114,6 +140,37 @@ export default function Home() {
         </div>
       </section>
 
+      <section aria-labelledby="qloo-heading" className="mx-auto max-w-5xl px-6 py-14">
+        <p className="text-sm font-semibold uppercase tracking-widest text-amber-300">Powered by Qloo</p>
+        <h2 id="qloo-heading" className="mt-2 text-2xl font-bold text-zinc-50 sm:text-3xl">
+          Every pick traces back to a Qloo API signal
+        </h2>
+        <p className="mt-3 max-w-3xl text-zinc-300">
+          GigRoute never asks for personal data. It sends only an artist name and place names, and reads Qloo&apos;s
+          privacy-safe, group-level affinity signals back.
+        </p>
+        <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+          {qlooUsage.map((u) => (
+            <div key={u.call} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+              <dt className="font-mono text-sm text-amber-200">{u.call}</dt>
+              <dd className="mt-1 text-sm text-zinc-300">{u.use}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-5 text-sm text-zinc-400">
+          Read the API reference at{' '}
+          <a
+            href="https://docs.qloo.com"
+            className="font-medium text-amber-300 underline underline-offset-2 hover:text-amber-200"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            docs.qloo.com
+          </a>
+          . The public demo runs on built-in sample data shaped like these responses until an API key is configured.
+        </p>
+      </section>
+
       <section id="plan-form" aria-labelledby="form-heading" className="mx-auto grid max-w-5xl gap-10 px-6 py-14 lg:grid-cols-2">
         <div>
           <h2 id="form-heading" className="text-2xl font-bold text-zinc-50 sm:text-3xl">
@@ -126,7 +183,8 @@ export default function Home() {
           <ul className="mt-6 space-y-2 text-sm text-zinc-300">
             <li>✓ Explainable picks: affinity, matching tags and the artists that drove each result</li>
             <li>✓ Live streaming results as the agent works</li>
-            <li>✓ Export your itinerary as Markdown</li>
+            <li>✓ A pitch email draft for every venue, ready to copy (never sent for you)</li>
+            <li>✓ Share a permalink, export Markdown or JSON, or print the plan</li>
           </ul>
         </div>
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">

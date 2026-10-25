@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "contract-check": "tsx --conditions=react-server scripts/qloo-contract-check.ts"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

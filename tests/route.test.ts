@@ -48,5 +48,12 @@ describe('POST /api/plan', () => {
     const done = events.find((e) => e.step === 'done')
     expect(done.plan.stops).toHaveLength(3)
     expect(done.plan.stops[0].venues.length).toBeGreaterThan(0)
+    expect(done.partial).toMatch(/^A 3-stop run for Radiohead/)
+  })
+
+  test('demo payload stays well under the old ~134 KB', async () => {
+    const res = await post({ artist: 'Radiohead', region: 'UK', stops: 3, demo: true })
+    const text = await res.text()
+    expect(text.length).toBeLessThan(75_000)
   })
 })

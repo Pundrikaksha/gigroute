@@ -32,7 +32,28 @@ With no environment variables, the app runs in **mock mode**: a deterministic mo
 | `npm run build` / `npm start` | Production build and server |
 | `npm test` | Vitest unit tests (all mocked, no network) |
 | `npm run lint` | ESLint |
-| `npx tsx scripts/qloo-contract-check.ts` | Optional live contract check against Qloo. Needs `QLOO_API_KEY` in your shell; prints only status and keys, never data. |
+| `npm run contract-check` | Optional live contract check against Qloo (see below). |
+
+### Live contract check (when the Qloo key arrives)
+
+The key lives only in your shell for the length of one command. It is never written to a file or committed:
+
+```bash
+QLOO_API_KEY=... npm run contract-check
+```
+
+The script (`scripts/qloo-contract-check.ts`) makes one real request per endpoint GigRoute uses (search, similar artists, fan hotspots, venues with explainability, brand and movie cross-domain, tags) and checks that the response has the fields the app reads. It prints one line per check, with counts and field names only. It never prints response data or the key (anything it prints is scrubbed of the key as a safeguard).
+
+```text
+PASS  GET /search (artist): 10 artists; fields: id, name, type, popularity, tags, explainability
+PASS  /v2/insights filter.type=urn:entity:place (venues in London) + explainability: 5 places; ...; explainability on 5/5
+FAIL  /v2/insights filter.type=urn:entity:movie (cross-domain): Qloo 403: entity type or endpoint not enabled for this key
+```
+
+- **PASS**: the endpoint answered and the fields GigRoute needs are there.
+- **FAIL**: the message says what was missing or which HTTP error came back (401 means a bad key or base URL, 403 means the entity type isn't enabled for the key, 400 means a parameter is rejected).
+- **SKIP**: `/search` failed, so the checks that need an artist ID didn't run.
+- Exit code `0` means everything passed; `1` means at least one check failed or was skipped. With no key set it calls nothing, prints a skip message and exits `0`.
 
 ## Environment variables
 
@@ -79,8 +100,9 @@ All requests are `GET` with the `X-Api-Key` header. The parameters are built in 
 ## Mock mode notes
 
 - Fixtures in `lib/qloo/fixtures/mock-data.json` are **hand-written fake data**, not real API responses. They copy the documented response shapes. Entity IDs are prefixed `mock-`, and addresses are placeholders.
-- Mock search knows Radiohead, The Strokes, Big Thief and Khruangbin. Other names show the “no match” empty state.
-- Mock hotspots cover London, Manchester, Bristol, New York, Chicago, Los Angeles, Austin and Seattle. `filter.location.query` filters them by name (for example `UK` or `USA`).
+- Mock search knows every artist in the fixtures: Radiohead, The Strokes, Big Thief and Khruangbin, plus the similar artists (Thom Yorke, Portishead, Interpol, Yeah Yeah Yeahs, Arcade Fire, Muse).
+- Any other name (say “Phoebe Bridgers”) is mapped deterministically onto one of the four fixture taste profiles (a stable hash of the name), so judges typing their own artist still get a full plan. The plan page, the summary and the exports label it clearly as sample data and name the profile used. With a real key, an unknown artist gets the honest “no match” state with a retry and suggested artists instead.
+- Mock hotspots cover London, Manchester, Bristol, New York, Chicago, Los Angeles, Austin and Seattle. `filter.location.query` filters them by name (for example `UK` or `USA`; `United Kingdom`, `England`, `US` and `United States` work too). Other regions (for example `India` or `Germany`) end with a message explaining the sample data's coverage, with links to try the UK, the USA or everywhere.
 - Fixture explainability is written against the seed artist. When you plan for another mock artist, the seed's share is credited to that artist.
 - Mock runs add a 250 ms pause between agent steps so the streaming UI is visible. Tests run without the pause.
 - Mock mode is active when `QLOO_MOCK=1` or `QLOO_API_KEY` is empty. The demo preset (`demo=1`) always uses mock mode.
@@ -91,6 +113,10 @@ All requests are `GET` with the `X-Api-Key` header. The parameters are built in 
 - `lib/qloo`: `RealQlooClient` and `MockQlooClient` behind one `QlooClient` interface, with shared request builders and normalizers.
 - `lib/agent`: a tool-calling agent over any OpenAI-compatible LLM (or `MockLLM`). Tool results are folded into a typed `Plan` (`lib/agent/plan.ts`), and a snapshot of that plan streams to the browser over SSE after every step.
 - `app/plan`: renders the streamed plan, with progress, skeletons, empty and error states, the explainability panels, and a Leaflet/OpenStreetMap route map.
+- Narration and pitches (`narrateTour`, `pitchEmail` in `lib/agent/plan.ts`) are pure and deterministic. The MockLLM's closing summary, the per-stop “why” text, the per-venue pitch drafts and the exports all come from the same Qloo evidence (affinity, tags, explainability, similar artists). Pitch drafts are shown with a copy button only; GigRoute never sends email.
+- **Permalinks and export:** `/plan?artist=…&region=…&cities=…&stops=…` encodes every input, so a shared link re-runs the same plan (deterministic in mock mode). The plan page can copy that link, download Markdown or JSON (`gigroute-plan@1`), or print a clean light-on-paper view. Nothing is stored on a server.
+- SSE events carry a plan snapshot only on result events (one per parallel batch), not the raw tool results, which keeps the demo stream around 70 KB.
+- Open Graph and Twitter card images are rendered by `next/og` (`app/opengraph-image.tsx`, `app/twitter-image.tsx`); the icon is `app/icon.svg`. Set `NEXT_PUBLIC_SITE_URL` to change the absolute URL used in the meta tags (defaults to `https://gigroute.vercel.app`).
 
 ## Known limits
 

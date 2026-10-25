@@ -96,6 +96,8 @@ export interface QlooEntity {
   lng?: number
   address?: string
   description?: string
+  /** Mock mode only: the fixture taste profile an unknown artist was mapped onto. */
+  sampleOf?: string
 }
 
 export type InsightsParams = Record<string, string | number | boolean>

@@ -5,7 +5,15 @@ import type {
   ChatCompletionMessageFunctionToolCall,
   ChatCompletionMessageParam,
 } from 'openai/resources/chat/completions'
-import { applyToolResult, createPlan, matchingTags, signalEntityIds, type Plan, type PlanInput } from './plan'
+import {
+  applyToolResult,
+  createPlan,
+  matchingTags,
+  narrateTour,
+  signalEntityIds,
+  type Plan,
+  type PlanInput,
+} from './plan'
 
 export interface AssistantMessage {
   role: 'assistant'
@@ -117,12 +125,7 @@ export class MockLLM implements LLMClient {
       return this.toolCalls([['draft_pitch', { venue_name: topVenue.name, artist_name: plan.artist.name, why }]])
     }
 
-    const route = plan.stops.map((s) => s.city.split(',')[0]).join(' → ')
-    const best = [...plan.stops].sort((a, b) => (b.affinity ?? 0) - (a.affinity ?? 0))[0]
-    return this.text(
-      `Planned ${plan.stops.length} stops for ${plan.artist.name}: ${route}.` +
-        (best?.affinity != null ? ` Strongest audience overlap: ${best.city} (${Math.round(best.affinity * 100)}%).` : '')
-    )
+    return this.text(narrateTour(plan).summary)
   }
 
   private text(content: string): AssistantMessage {
