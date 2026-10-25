@@ -66,8 +66,46 @@ describe('MockQlooClient', () => {
     expect(res[0].tags.map((t) => t.name)).toContain('Art Rock')
   })
 
-  test('search for an unknown artist is empty', async () => {
-    expect(await client.search('Definitely Not A Band')).toEqual([])
+  test('every artist in the fixtures is searchable, exact match first', async () => {
+    for (const name of ['Muse', 'Thom Yorke', 'Portishead', 'Arcade Fire']) {
+      const res = await client.search(name, ['urn:entity:artist'])
+      expect(res[0]).toMatchObject({ name, type: 'urn:entity:artist' })
+      expect(res[0].sampleOf).toBeUndefined()
+    }
+  })
+
+  test('an unknown artist maps deterministically onto a labelled fixture profile', async () => {
+    const a = await client.search('Phoebe Bridgers', ['urn:entity:artist'])
+    const b = await client.search('phoebe bridgers', ['urn:entity:artist'])
+    expect(a).toHaveLength(1)
+    expect(a[0]).toMatchObject({ name: 'Phoebe Bridgers', id: 'mock-sample-phoebe-bridgers' })
+    expect(['Radiohead', 'The Strokes', 'Big Thief', 'Khruangbin']).toContain(a[0].sampleOf)
+    expect(a[0].description).toMatch(/^Sample data/)
+    expect(a[0].tags.length).toBeGreaterThan(0)
+    expect(b[0].sampleOf).toBe(a[0].sampleOf)
+    expect((await client.search('Arijit Singh'))[0].id).toBe('mock-sample-arijit-singh')
+    // Non-artist searches don't invent entities.
+    expect(await client.search('Nowhere', ['urn:entity:place'])).toEqual([])
+  })
+
+  test('similarArtists never includes the signalled artist itself', async () => {
+    const res = await client.similarArtists(['mock-artist-muse'])
+    expect(res.map((r) => r.name)).not.toContain('Muse')
+  })
+
+  test('explainability merges the seed share into an existing signal', async () => {
+    const res = await client.venuesInCity(['mock-artist-thom-yorke', 'mock-artist-portishead'], 'London')
+    for (const v of res) {
+      const ids = v.explainability.map((e) => e.entityId)
+      expect(new Set(ids).size).toBe(ids.length)
+    }
+  })
+
+  test('region aliases and regions without sample data', async () => {
+    const uk = await client.fanHotspots([SEED], 'United Kingdom')
+    expect(uk.length).toBeGreaterThan(0)
+    expect((await client.fanHotspots([SEED], 'United States')).every((r) => r.name.endsWith('USA'))).toBe(true)
+    expect(await client.fanHotspots([SEED], 'India')).toEqual([])
   })
 
   test('similarArtists returns entities sorted by affinity and honours take', async () => {
