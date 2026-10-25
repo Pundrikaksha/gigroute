@@ -10,6 +10,7 @@ import {
   planHref,
   planToJSON,
   planToMarkdown,
+  tasteProfilePhrase,
   type Plan,
   type PlanInput,
 } from '../lib/agent/plan'
@@ -64,11 +65,36 @@ describe('narrateTour', () => {
     const { summary } = narrateTour(sample)
     expect(sample.artist?.sampleOf).toBe('The Strokes')
     expect(summary).toMatch(
-      /Sample data: Arijit Singh isn't in the built-in fixtures, so this plan uses the The Strokes taste profile./
+      /Sample data: Arijit Singh isn't in the built-in fixtures, so this plan uses The Strokes taste profile\./
     )
+    expect(summary).not.toMatch(/the The Strokes/)
     expect(summary).toMatch(/driven mostly by fans of artists like The Strokes \(/)
     expect(summary).not.toMatch(/fans of Arijit Singh/)
     expect(summary).not.toMatch(/Thom Yorke|Portishead|Radiohead|Dr\. Martens/)
+  })
+
+  test('a profile name that starts with The does not double the article', () => {
+    expect(tasteProfilePhrase('The Strokes')).toBe('The Strokes taste profile')
+    expect(tasteProfilePhrase('Big Thief')).toBe('the Big Thief taste profile')
+  })
+
+  test('The Strokes sample copy drops the extra article; other profiles keep it', async () => {
+    const strokes = await planFor({ artist: 'Arijit Singh', region: 'UK', stops: 2 })
+    const strokesSummary = narrateTour(strokes).summary
+    expect(strokesSummary).toContain('uses The Strokes taste profile.')
+    expect(strokesSummary).not.toContain('the The Strokes')
+
+    const bigThief = await planFor({ artist: 'Phoebe Bridgers', region: 'US', stops: 2 })
+    expect(narrateTour(bigThief).summary).toContain('uses the Big Thief taste profile.')
+  })
+
+  test('a sample pitch credits fans of similar artists, not the typed artist\'s own listeners', async () => {
+    const plan = await planFor({ artist: 'Arijit Singh', region: 'UK', stops: 2 })
+    const body = pitchEmail(plan, plan.stops[0], plan.stops[0].venues![0]).body
+    expect(body).toContain('affinity with fans of similar artists')
+    expect(body).toContain('The figures come from The Strokes taste profile, not Arijit Singh\'s own audience.')
+    expect(body).not.toContain('our listeners')
+    expect(body).not.toContain('the The Strokes')
   })
 
   test('an empty plan has no summary', () => {

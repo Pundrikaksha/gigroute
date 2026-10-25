@@ -236,6 +236,16 @@ export function draftPitch(venue: string, artist: string, why?: string): string 
 
 const pct = (n?: number) => (n == null ? 'n/a' : `${Math.round(n * 100)}%`)
 const shortCity = (city: string) => city.split(',')[0].trim()
+
+/**
+ * "the Big Thief taste profile", or "The Strokes taste profile" when the name
+ * already starts with "The", so the sentence never reads "the The Strokes".
+ */
+export function tasteProfilePhrase(name: string): string {
+  const trimmed = name.trim()
+  const article = /^the\s/i.test(trimmed) ? '' : 'the '
+  return `${article}${trimmed} taste profile`
+}
 const PLACE_CATEGORY = 'urn:tag:category:place'
 
 /** "a", "a and b", "a, b and c" */
@@ -316,7 +326,7 @@ export function narrateTour(plan: Plan): TourNarrative {
   }
   if (plan.artist?.sampleOf) {
     sentences.push(
-      `Sample data: ${name} isn't in the built-in fixtures, so this plan uses the ${plan.artist.sampleOf} taste profile.`
+      `Sample data: ${name} isn't in the built-in fixtures, so this plan uses ${tasteProfilePhrase(plan.artist.sampleOf)}.`
     )
   }
   return { summary: sentences.join(' '), stops }
@@ -335,10 +345,14 @@ export function pitchEmail(plan: Plan, stop: PlanStop, venue: QlooEntity): Pitch
   const artist = plan.artist?.name ?? plan.input.artist
   const city = shortCity(stop.city)
   const evidence: string[] = []
-  evidence.push(
-    `Qloo audience data puts ${venue.name} at ${pct(venue.affinity)} affinity with our listeners` +
-      (stop.affinity != null ? `, in a city that scores ${pct(stop.affinity)} overall.` : '.')
-  )
+  const cityScore = stop.affinity != null ? `, in a city that scores ${pct(stop.affinity)} overall.` : '.'
+  if (plan.artist?.sampleOf) {
+    evidence.push(
+      `Qloo audience data puts ${venue.name} at ${pct(venue.affinity)} affinity with fans of similar artists${cityScore} The figures come from ${tasteProfilePhrase(plan.artist.sampleOf)}, not ${artist}'s own audience.`
+    )
+  } else {
+    evidence.push(`Qloo audience data puts ${venue.name} at ${pct(venue.affinity)} affinity with our listeners${cityScore}`)
+  }
   const tags = matchingTags(plan, venue.tags).filter((t) => t.type !== PLACE_CATEGORY).map((t) => t.name)
   if (tags.length > 0) evidence.push(`Shared taste tags: ${list(tags)}.`)
   const drivers = resolveDrivers(plan, venue.explainability).filter(
