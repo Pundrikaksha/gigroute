@@ -72,8 +72,33 @@ summary::-webkit-details-marker {
     border-color: #d4d4d8 !important;
     box-shadow: none !important;
   }
-  article,
-  li {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  /* Keep the stops heading with the first card so it is not left alone at the bottom of a page. */
+  .gr-stops-lead {
     break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Each stop card stays whole. The list itself may split so later cards flow onto the next page. */
+  .gr-stops {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+  .gr-stop {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    display: none !important;
   }
 }

@@ -59,11 +59,16 @@ describe('narrateTour', () => {
     expect(narrateTour(p).stops[0].text).toMatch(/no audience data/)
   })
 
-  test('sample-profile plans are labelled', async () => {
-    const sample = await planFor({ artist: 'Arijit Singh', stops: 2 })
-    expect(narrateTour(sample).summary).toMatch(
-      new RegExp(`Sample data: Arijit Singh isn't in the built-in fixtures, so this plan uses the ${sample.artist?.sampleOf} taste profile.`)
+  test('sample-profile plans are labelled and attribute the profile, not the typed name', async () => {
+    const sample = await planFor({ artist: 'Arijit Singh', region: 'UK', stops: 2 })
+    const { summary } = narrateTour(sample)
+    expect(sample.artist?.sampleOf).toBe('The Strokes')
+    expect(summary).toMatch(
+      /Sample data: Arijit Singh isn't in the built-in fixtures, so this plan uses the The Strokes taste profile./
     )
+    expect(summary).toMatch(/driven mostly by fans of artists like The Strokes \(/)
+    expect(summary).not.toMatch(/fans of Arijit Singh/)
+    expect(summary).not.toMatch(/Thom Yorke|Portishead|Radiohead|Dr\. Martens/)
   })
 
   test('an empty plan has no summary', () => {

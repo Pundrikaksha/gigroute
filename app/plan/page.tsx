@@ -4,8 +4,9 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { narrateTour, planFileName, planHref, planToJSON, planToMarkdown, type Plan } from '@/lib/agent/plan'
+import { NO_PLAN_STATUS, narrateTour, planFileName, planHref, planToJSON, planToMarkdown, type Plan } from '@/lib/agent/plan'
 import StopCard from '@/components/plan/StopCard'
+import { PHASES, PhaseList } from '@/components/plan/phases'
 import { Skeleton, StopSkeleton, TagChips, pct } from '@/components/plan/ui'
 
 const Map = dynamic(() => import('@/components/Map'), {
@@ -23,15 +24,6 @@ interface PlanEvent {
 
 type Status = 'streaming' | 'done' | 'error'
 
-const PHASES = [
-  { tool: 'resolve_artist', label: 'Resolve the artist in Qloo' },
-  { tool: 'similar_artists', label: 'Find similar artists for co-bills' },
-  { tool: 'fan_hotspots', label: 'Map fan hotspots' },
-  { tool: 'venues_in_city', label: 'Rank venues in each city' },
-  { tool: 'cross_domain_tastes', label: 'Cross-domain merch ideas' },
-  { tool: 'plan_route', label: 'Route the tour' },
-] as const
-
 const DEMO_HREF = '/plan?artist=Radiohead&region=UK&stops=3&demo=1'
 const SUGGESTED_ARTISTS = ['Radiohead', 'Big Thief', 'Khruangbin']
 // Mirrors MOCK_REGIONS in lib/qloo/mock.ts (server-only), for the "no sample data here" notice.
@@ -41,36 +33,6 @@ const buttonPrimary =
   'inline-flex items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-300'
 const buttonSecondary =
   'inline-flex items-center justify-center rounded-lg border border-zinc-600 px-4 py-2 text-sm font-semibold text-zinc-100 hover:border-zinc-400'
-
-function PhaseList({ started, finished, status }: { started: Set<string>; finished: Set<string>; status: Status }) {
-  return (
-    <ol className="space-y-1.5 text-sm">
-      {PHASES.map(({ tool, label }) => {
-        const state = finished.has(tool) ? 'done' : started.has(tool) && status === 'streaming' ? 'active' : 'pending'
-        return (
-          <li key={tool} className="flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className={
-                state === 'done'
-                  ? 'flex h-4 w-4 items-center justify-center rounded-full bg-emerald-400 text-[10px] font-bold text-zinc-950'
-                  : state === 'active'
-                    ? 'h-4 w-4 animate-spin rounded-full border-2 border-amber-400 border-t-transparent'
-                    : 'h-4 w-4 rounded-full border-2 border-zinc-700'
-              }
-            >
-              {state === 'done' ? '✓' : ''}
-            </span>
-            <span className={state === 'pending' ? 'text-zinc-500' : 'text-zinc-200'}>
-              {label}
-              <span className="sr-only"> ({state === 'done' ? 'done' : state === 'active' ? 'in progress' : 'pending'})</span>
-            </span>
-          </li>
-        )
-      })}
-    </ol>
-  )
-}
 
 function Notice({
   tone,
@@ -136,6 +98,10 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
         setStatus('done')
         setLiveText('Tour plan ready.')
       }
+      if (e.step === 'no_plan') {
+        setStatus('done')
+        setLiveText(NO_PLAN_STATUS)
+      }
     }
 
     const run = async () => {
@@ -173,7 +139,7 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
           for (const event of events) {
             if (!event.startsWith('data: ')) continue
             const parsed: PlanEvent = JSON.parse(event.substring(6))
-            if (['done', 'error', 'needs_input'].includes(parsed.step)) sawTerminal = true
+            if (['done', 'error', 'needs_input', 'no_plan'].includes(parsed.step)) sawTerminal = true
             handleEvent(parsed)
           }
         }
@@ -243,6 +209,13 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
 
   const stops = plan?.stops ?? []
   const streaming = status === 'streaming'
+  const noPlan =
+    status === 'done' &&
+    Boolean(plan?.artist) &&
+    stops.length === 0 &&
+    !plan?.artistNotFound &&
+    candidates.length === 0 &&
+    toolErrors.length === 0
   const failedWithoutResults = status === 'done' && stops.length === 0 && toolErrors.length > 0
   const retryActions = (
     <>
@@ -425,9 +398,9 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
           className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4 print:hidden"
         >
           <h2 id="progress-heading" className="mb-3 text-sm font-semibold text-zinc-200">
-            {streaming ? 'Planning…' : status === 'error' ? 'Stopped' : 'Steps'}
+            {streaming ? 'Planning…' : status === 'error' ? 'Stopped' : noPlan ? NO_PLAN_STATUS : 'Steps'}
           </h2>
-          <PhaseList started={started} finished={finished} status={status} />
+          <PhaseList started={started} finished={finished} status={status} noPlan={noPlan} />
           <p role="status" aria-live="polite" className="sr-only">
             {liveText}
           </p>
@@ -452,22 +425,39 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
 
         {(stops.length > 0 || streaming) && (
           <section aria-labelledby="stops-heading" aria-busy={streaming}>
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <h2 id="stops-heading" className="text-xl font-bold text-zinc-50">
-                Stops{stops.length > 0 && ` (${stops.length})`}
-              </h2>
-            </div>
-            <div className="space-y-4">
-              {stops.map((stop, i) => (
-                <StopCard key={stop.city} plan={plan as Plan} stop={stop} index={i} why={narrative?.stops[i]?.text} />
-              ))}
-              {streaming && stops.length === 0 && (
-                <>
+            {stops.length > 0 ? (
+              <>
+                <div className="gr-stops-lead">
+                  <h2 id="stops-heading" className="mb-3 text-xl font-bold text-zinc-50">
+                    Stops ({stops.length})
+                  </h2>
+                  <StopCard plan={plan as Plan} stop={stops[0]} index={0} why={narrative?.stops[0]?.text} />
+                </div>
+                {stops.length > 1 && (
+                  <div className="gr-stops mt-4 space-y-4">
+                    {stops.slice(1).map((stop, i) => (
+                      <StopCard
+                        key={stop.city}
+                        plan={plan as Plan}
+                        stop={stop}
+                        index={i + 1}
+                        why={narrative?.stops[i + 1]?.text}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <h2 id="stops-heading" className="mb-3 text-xl font-bold text-zinc-50">
+                  Stops
+                </h2>
+                <div className="space-y-4">
                   <StopSkeleton />
                   <StopSkeleton />
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </section>
         )}
 

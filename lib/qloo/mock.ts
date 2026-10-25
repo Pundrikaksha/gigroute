@@ -19,6 +19,14 @@ import {
 } from './requests'
 import mockData from './fixtures/mock-data.json'
 
+interface ProfileBundle {
+  /** Explainability for this profile's cities and venues. The profile entity keeps the lead share. */
+  explainability?: { entity_id: string; score: number }[]
+  similarArtists?: QlooApiEntity[]
+  brand?: QlooApiEntity[]
+  movie?: QlooApiEntity[]
+}
+
 interface Fixtures {
   seedEntityId: string
   search: QlooSearchResponse
@@ -30,6 +38,8 @@ interface Fixtures {
     brand: QlooInsightsResponse
     movie: QlooInsightsResponse
   }
+  /** Per taste-profile overrides. Missing lists fall back to the seed insights (Radiohead). */
+  profiles?: Record<string, ProfileBundle>
 }
 
 const fixtures = mockData as unknown as Fixtures
@@ -55,13 +65,38 @@ function regionAlias(location: string): string {
   return REGION_ALIASES[q] ?? q
 }
 
-/** Every artist that appears anywhere in the fixtures: the search results plus the similar artists. */
+/** Every artist that appears anywhere in the fixtures: the search results plus each profile's similar artists. */
 function searchableArtists(): QlooApiEntity[] {
   const seen = new Set(fixtures.search.results.map((a) => a.entity_id))
-  const similar = fixtures.insights.artist.results.entities
-    .filter((a) => !seen.has(a.entity_id))
+  const pools = [
+    fixtures.insights.artist.results.entities,
+    ...Object.values(fixtures.profiles ?? {}).flatMap((bundle) => bundle.similarArtists ?? []),
+  ]
+  const similar = pools
+    .flat()
+    .filter((a) => !seen.has(a.entity_id) && seen.add(a.entity_id))
     .map((a) => ({ entity_id: a.entity_id, name: a.name, types: [ARTIST], popularity: a.popularity, tags: a.tags }))
   return [...fixtures.search.results, ...similar]
+}
+
+/** sample id → profile entity id, filled by sampleArtist so punctuation survives the slug. */
+const sampleProfileIds = new Map<string, string>()
+
+function profileIdForSample(sampleId: string): string | undefined {
+  const cached = sampleProfileIds.get(sampleId)
+  if (cached) return cached
+  const slug = sampleId.startsWith('mock-sample-') ? sampleId.slice('mock-sample-'.length) : ''
+  if (!slug) return undefined
+  const profiles = fixtures.search.results
+  return profiles[stableHash(slug.replace(/-/g, ' ')) % profiles.length]?.entity_id
+}
+
+/** The fixture profile a sample-artist signal should be served from, if any. */
+function signaledProfileId(signals: string[]): string | undefined {
+  for (const id of signals) {
+    if (id.startsWith('mock-sample-')) return profileIdForSample(id)
+  }
+  return undefined
 }
 
 /** Small, stable string hash (FNV-1a) so the same name always maps to the same profile. */
@@ -82,14 +117,17 @@ export function sampleArtist(name: string): QlooEntity {
   const profiles = fixtures.search.results
   const profile = profiles[stableHash(name) % profiles.length]
   const slug = name.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'artist'
+  const id = `mock-sample-${slug}`
+  sampleProfileIds.set(id, profile.entity_id)
   return {
     ...normalizeEntity({
       ...profile,
-      entity_id: `mock-sample-${slug}`,
+      entity_id: id,
       name,
       properties: { short_description: `Sample data: mapped onto the ${profile.name} taste profile.` },
     }),
     sampleOf: profile.name,
+    sampleProfileId: profile.entity_id,
   }
 }
 
@@ -130,11 +168,15 @@ export class MockQlooClient implements QlooClient {
     const filterType = params['filter.type']
     const location = params['filter.location.query'] ? String(params['filter.location.query']) : ''
     const take = clampTake(Number(params.take ?? 20))
+    const signalParam = String(params['signal.interests.entities'] ?? '')
+    const signals = signalParam.split(',').filter(Boolean)
+    // Unknown names are sample ids. Serve that profile's bundle, not the Radiohead seed.
+    const profileId = signaledProfileId(signals)
 
     let response: QlooInsightsResponse | undefined
     switch (filterType) {
       case 'urn:entity:artist':
-        response = fixtures.insights.artist
+        response = insightResponse(filterType, entitiesForProfile(profileId, 'similarArtists'))
         break
       case 'urn:entity:destination':
         response = fixtures.insights.destination
@@ -143,27 +185,29 @@ export class MockQlooClient implements QlooClient {
         response = fixtures.insights.place[findCityKey(location)]
         break
       case 'urn:entity:brand':
-        response = fixtures.insights.brand
+        response = insightResponse(filterType, entitiesForProfile(profileId, 'brand'))
         break
       case 'urn:entity:movie':
-        response = fixtures.insights.movie
+        response = insightResponse(filterType, entitiesForProfile(profileId, 'movie'))
         break
     }
     if (!response) return empty(filterType)
 
-    const signals = String(params['signal.interests.entities'] ?? '').split(',').filter(Boolean)
     let entities = response.results.entities
     if (filterType === ARTIST) {
-      // An artist is never "similar" to itself.
-      entities = entities.filter((e) => !signals.includes(e.entity_id))
+      // An artist is never "similar" to itself, and a sample id is not a fixture artist.
+      entities = entities.filter((e) => !signals.includes(e.entity_id) && e.entity_id !== profileId)
     }
     if (filterType === 'urn:entity:destination' && location) {
       const q = regionAlias(location)
       entities = entities.filter((e) => e.name.toLowerCase().includes(q))
     }
     entities = entities.slice(0, take)
-    if (params['feature.explainability'] === true || params['feature.explainability'] === 'true') {
-      entities = entities.map((e) => remapSeed(e, String(params['signal.interests.entities'] ?? '')))
+    const wantExplain = params['feature.explainability'] === true || params['feature.explainability'] === 'true'
+    if (wantExplain && profileId && (filterType === 'urn:entity:destination' || filterType === 'urn:entity:place')) {
+      entities = entities.map((e) => withProfileTaste(e, profileId, signals))
+    } else if (wantExplain) {
+      entities = entities.map((e) => remapSeed(e, signalParam))
     } else {
       entities = entities.map(({ query, ...rest }) => ({ ...rest, query: { affinity: query?.affinity } }))
     }
@@ -204,10 +248,48 @@ function findCityKey(location: string): string {
   )
 }
 
+const GENRE = 'urn:tag:genre:music'
+
+function insightResponse(filterType: unknown, entities: QlooApiEntity[]): QlooInsightsResponse {
+  return { success: true, results: { entities }, query: { 'filter.type': filterType } }
+}
+
+/**
+ * Lists that belong to one taste profile. Radiohead is the seed bundle already stored
+ * on insights.*; the other searchable profiles carry their own lists.
+ */
+function entitiesForProfile(profileId: string | undefined, kind: 'similarArtists' | 'brand' | 'movie'): QlooApiEntity[] {
+  const custom = profileId ? fixtures.profiles?.[profileId]?.[kind] : undefined
+  if (custom && custom.length > 0) return custom
+  if (kind === 'similarArtists') return fixtures.insights.artist.results.entities
+  if (kind === 'brand') return fixtures.insights.brand.results.entities
+  return fixtures.insights.movie.results.entities
+}
+
+/**
+ * Cities and venues are shared geography. For a sample artist, rewrite the taste-specific
+ * fields (genre tags and explainability) so they cite the chosen profile, never the typed name.
+ */
+function withProfileTaste(entity: QlooApiEntity, profileId: string, signals: string[]): QlooApiEntity {
+  const allowed = new Set(signals.filter((id) => !id.startsWith('mock-sample-')))
+  allowed.add(profileId)
+  const explain = (fixtures.profiles?.[profileId]?.explainability ?? [])
+    .filter((e) => allowed.has(e.entity_id))
+    .map((e) => ({ entity_id: e.entity_id, score: e.score }))
+  const genres = fixtures.search.results.find((a) => a.entity_id === profileId)?.tags ?? []
+  const tags = [...(entity.tags ?? []).filter((t) => t.type !== GENRE), ...genres]
+  return {
+    ...entity,
+    tags,
+    query: { ...entity.query, explainability: { 'signal.interests.entities': explain } },
+  }
+}
+
 /**
  * Fixture explainability is written against the seed artist (Radiohead). When the
- * mock is asked about another artist, credit the seed's share to that artist and
- * keep only entries for entities that were actually sent as signals.
+ * mock is asked about another *fixture* artist, credit the seed's share to that artist
+ * and keep only entries for entities that were actually sent as signals.
+ * Sample artists do not come through here: their typed name is not a fixture entity.
  */
 function remapSeed(entity: QlooApiEntity, signalParam: string): QlooApiEntity {
   const signals = signalParam.split(',').filter(Boolean)

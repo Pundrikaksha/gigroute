@@ -1,6 +1,6 @@
 import { expect, test, describe } from 'vitest'
 import { runAgent, type AgentEvent } from '../lib/agent/agent'
-import { parsePlanInput, resolveDrivers, type PlanInput } from '../lib/agent/plan'
+import { NO_PLAN_STATUS, parsePlanInput, resolveDrivers, type PlanInput } from '../lib/agent/plan'
 import { MockQlooClient } from '../lib/qloo/mock'
 
 function input(body: Record<string, unknown>): PlanInput {
@@ -12,7 +12,7 @@ function input(body: Record<string, unknown>): PlanInput {
 async function run(body: Record<string, unknown>) {
   const events: AgentEvent[] = []
   const result = await runAgent(input(body), (e) => events.push(e))
-  const done = events.find((e) => e.step === 'done')
+  const done = events.find((e) => e.step === 'done' || e.step === 'no_plan')
   return { events, result, plan: done?.plan }
 }
 
@@ -50,12 +50,16 @@ describe('Agent end to end (MockLLM + MockQloo)', () => {
 
   test('in mock mode an unknown artist still gets a full, labelled sample plan', async () => {
     const { result, plan } = await run({ artist: 'Phoebe Bridgers', stops: 3 })
-    expect(plan?.artist).toMatchObject({ name: 'Phoebe Bridgers', sampleOf: expect.any(String) })
+    expect(plan?.artist).toMatchObject({ name: 'Phoebe Bridgers', sampleOf: 'Big Thief' })
     expect(plan?.stops).toHaveLength(3)
     expect(plan?.stops.every((s) => (s.venues?.length ?? 0) > 0)).toBe(true)
     expect(result).toMatch(/Sample data: Phoebe Bridgers isn't in the built-in fixtures/)
-    // Explainability credits the user's artist, not the fixture seed.
-    expect(resolveDrivers(plan!, plan!.stops[0].explainability)[0].name).toBe('Phoebe Bridgers')
+    expect(result).toMatch(/fans of artists like Big Thief/)
+    // Fixture attribution names the profile, never the typed artist.
+    const drivers = resolveDrivers(plan!, plan!.stops[0].explainability)
+    expect(drivers[0].name).toBe('artists like Big Thief')
+    expect(drivers.map((d) => d.name).join(' ')).not.toContain('Phoebe Bridgers')
+    expect(plan?.similarArtists.map((a) => a.name)).not.toContain('Thom Yorke')
   })
 
   test('a fixture similar artist (Muse) plans directly', async () => {
@@ -71,6 +75,12 @@ describe('Agent end to end (MockLLM + MockQloo)', () => {
     expect(result).toMatch(/no fan hotspots .* in India/)
     expect(plan?.stops).toEqual([])
     expect(events.some((e) => e.step === 'error')).toBe(false)
+    expect(events.some((e) => e.step === 'done')).toBe(false)
+    expect(events.at(-1)).toMatchObject({ step: 'no_plan', text: NO_PLAN_STATUS })
+    expect(events.some((e) => e.step === 'fan_hotspots_result')).toBe(true)
+    expect(events.some((e) => e.step === 'venues_in_city' || e.step === 'plan_route' || e.step === 'cross_domain_tastes')).toBe(
+      false,
+    )
   })
 
   test('real mode: an artist Qloo does not know ends with an empty plan, not an error', async () => {

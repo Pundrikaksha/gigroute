@@ -74,6 +74,35 @@ describe('MockQlooClient', () => {
     }
   })
 
+  test('an unknown artist is served its mapped profile, not the Radiohead seed', async () => {
+    const phoebe = (await client.search('Phoebe Bridgers', ['urn:entity:artist']))[0]
+    expect(phoebe).toMatchObject({ sampleOf: 'Big Thief', sampleProfileId: 'mock-artist-big-thief' })
+    const similar = await client.similarArtists([phoebe.id])
+    expect(similar.map((a) => a.name)).toEqual(['Adrianne Lenker', 'Buck Meek', 'Florist'])
+    expect((await client.crossDomain([phoebe.id], 'brand')).map((b) => b.name)).toEqual(['Martin', 'Patagonia', 'Field Notes'])
+    expect((await client.crossDomain([phoebe.id], 'movie')).map((m) => m.name)).toEqual([
+      'Wendy and Lucy',
+      'Old Joy',
+      'Certain Women',
+    ])
+
+    const signals = [phoebe.id, ...similar.map((a) => a.id)]
+    const cities = await client.fanHotspots(signals, 'US')
+    expect(cities.length).toBeGreaterThan(0)
+    expect(cities.every((c) => c.name.endsWith('USA'))).toBe(true)
+    for (const city of cities) {
+      const ids = city.explainability.map((e) => e.entityId)
+      expect(ids).toContain('mock-artist-big-thief')
+      expect(ids).not.toContain(phoebe.id)
+      expect(ids).not.toContain('mock-artist-radiohead')
+      expect(ids).not.toContain('mock-artist-thom-yorke')
+      expect(city.tags.map((t) => t.name)).toEqual(expect.arrayContaining(['Indie Folk', 'Indie Rock']))
+    }
+    const venues = await client.venuesInCity(signals, 'Austin, USA')
+    expect(venues[0].explainability[0]).toMatchObject({ entityId: 'mock-artist-big-thief', score: 0.61 })
+    expect(venues[0].explainability.map((e) => e.entityId)).not.toContain(phoebe.id)
+  })
+
   test('an unknown artist maps deterministically onto a labelled fixture profile', async () => {
     const a = await client.search('Phoebe Bridgers', ['urn:entity:artist'])
     const b = await client.search('phoebe bridgers', ['urn:entity:artist'])

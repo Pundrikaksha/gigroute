@@ -5,6 +5,9 @@ import type { ExplainabilityEntry, QlooEntity, QlooTag } from '../qloo/types'
 export const DEFAULT_STOPS = 5
 export const MAX_STOPS = 8
 
+/** Shown when fan hotspots come back empty. Later steps are skipped, not left pending. */
+export const NO_PLAN_STATUS = 'No plan: no hotspots in this region'
+
 export interface PlanInput {
   artist: string
   region?: string
@@ -27,7 +30,7 @@ export interface PlanStop {
 export interface Plan {
   input: PlanInput
   /** sampleOf is set in mock mode when an unknown artist was mapped onto a fixture profile. */
-  artist?: { id: string; name: string; tags: QlooTag[]; sampleOf?: string }
+  artist?: { id: string; name: string; tags: QlooTag[]; sampleOf?: string; sampleProfileId?: string }
   artistNotFound?: boolean
   candidates?: { id: string; name: string }[]
   similarArtists: QlooEntity[]
@@ -105,6 +108,7 @@ export function applyToolResult(plan: Plan, tool: string, args: Record<string, u
       const a = result[0]
       const artist: NonNullable<Plan['artist']> = { id: a.id, name: a.name, tags: a.tags ?? [] }
       if (a.sampleOf) artist.sampleOf = a.sampleOf
+      if (a.sampleProfileId) artist.sampleProfileId = a.sampleProfileId
       return { ...plan, artist, artistNotFound: false }
     }
     case 'similar_artists':
@@ -190,10 +194,18 @@ export function nearestNeighbourRoute<T extends { lat?: number; lng?: number }>(
   return [...route, ...unlocated]
 }
 
-/** Map explainability entries to names using the artist and similar artists in the plan. */
+/**
+ * Map explainability entries to names using the artist and similar artists in the plan.
+ * Sample fallbacks attribute the fixture share to the profile ("artists like Big Thief"),
+ * never to the name the user typed.
+ */
 export function resolveDrivers(plan: Plan, entries: ExplainabilityEntry[]): Driver[] {
   const names = new Map<string, string>()
-  if (plan.artist) names.set(plan.artist.id, plan.artist.name)
+  if (plan.artist) {
+    const like = plan.artist.sampleOf ? `artists like ${plan.artist.sampleOf}` : null
+    names.set(plan.artist.id, like ?? plan.artist.name)
+    if (like && plan.artist.sampleProfileId) names.set(plan.artist.sampleProfileId, like)
+  }
   for (const a of plan.similarArtists) names.set(a.id, a.name)
   return entries.map((e) => ({ id: e.entityId, name: names.get(e.entityId) ?? 'Related artist', score: e.score }))
 }
@@ -278,10 +290,12 @@ export function narrateTour(plan: Plan): TourNarrative {
 
   const sentences: string[] = []
   const route = plan.stops.map((s) => shortCity(s.city)).join(' → ')
+  // Sample plans are ranked on the fixture profile, so attribution names that profile.
+  const taste = plan.artist?.sampleOf ? `artists like ${plan.artist.sampleOf}` : name
+  const similarClause =
+    plan.similarArtists.length === 0 ? '' : plan.artist?.sampleOf ? ' and the closest similar artists' : ' and its closest similar artists'
   sentences.push(
-    `A ${plan.stops.length}-stop run for ${name}: ${route}. Every city and room was ranked by Qloo audience affinity for ${name}${
-      plan.similarArtists.length > 0 ? ' and its closest similar artists' : ''
-    }, not by guesswork.`
+    `A ${plan.stops.length}-stop run for ${name}: ${route}. Every city and room was ranked by Qloo audience affinity for ${taste}${similarClause}, not by guesswork.`
   )
   const best = [...plan.stops].sort((a, b) => (b.affinity ?? 0) - (a.affinity ?? 0))[0]
   if (best.affinity != null) {
@@ -327,7 +341,9 @@ export function pitchEmail(plan: Plan, stop: PlanStop, venue: QlooEntity): Pitch
   )
   const tags = matchingTags(plan, venue.tags).filter((t) => t.type !== PLACE_CATEGORY).map((t) => t.name)
   if (tags.length > 0) evidence.push(`Shared taste tags: ${list(tags)}.`)
-  const drivers = resolveDrivers(plan, venue.explainability).filter((d) => d.id !== plan.artist?.id)
+  const drivers = resolveDrivers(plan, venue.explainability).filter(
+    (d) => d.id !== plan.artist?.id && d.id !== plan.artist?.sampleProfileId,
+  )
   if (drivers.length > 0) evidence.push(`Your regulars also over-index on ${list(drivers.slice(0, 2).map((d) => d.name))}.`)
   const coBills = plan.similarArtists.slice(0, 2).map((a) => a.name)
   if (coBills.length > 0) evidence.push(`We're open to sharing the bill with acts like ${list(coBills)}, who draw the same crowd.`)

@@ -98,6 +98,8 @@ export interface QlooEntity {
   description?: string
   /** Mock mode only: the fixture taste profile an unknown artist was mapped onto. */
   sampleOf?: string
+  /** Mock mode only: fixture entity id of the profile named by sampleOf. */
+  sampleProfileId?: string
 }
 
 export type InsightsParams = Record<string, string | number | boolean>
