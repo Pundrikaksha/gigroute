@@ -94,7 +94,7 @@ export default function StopCard({
   const headingId = `stop-${index}`
 
   return (
-    <article aria-labelledby={headingId} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+    <article aria-labelledby={headingId} className="gr-stop rounded-xl border border-zinc-800 bg-zinc-900 p-4">
       <header className="flex items-center gap-3">
         <span
           aria-hidden="true"

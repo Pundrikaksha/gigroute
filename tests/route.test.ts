@@ -1,5 +1,6 @@
 import { expect, test, describe } from 'vitest'
 import { NextRequest } from 'next/server'
+import { NO_PLAN_STATUS } from '../lib/agent/plan'
 import { executeTool } from '../lib/agent/tools'
 import { POST } from '../app/api/plan/route'
 
@@ -49,6 +50,19 @@ describe('POST /api/plan', () => {
     expect(done.plan.stops).toHaveLength(3)
     expect(done.plan.stops[0].venues.length).toBeGreaterThan(0)
     expect(done.partial).toMatch(/^A 3-stop run for Radiohead/)
+  })
+
+  test('a region with no hotspots ends on a no-plan event', async () => {
+    const res = await post({ artist: 'Arijit Singh', region: 'India', demo: true })
+    const events = await readEvents(res)
+    expect(events.at(-1)).toMatchObject({ step: 'no_plan', text: NO_PLAN_STATUS })
+    expect(events.at(-1).plan.stops).toEqual([])
+    expect(events.at(-1).plan.artist.sampleOf).toBe('The Strokes')
+    expect(events.some((e) => e.step === 'done')).toBe(false)
+    expect(events.some((e) => e.step === 'fan_hotspots_result')).toBe(true)
+    expect(events.some((e) => e.step === 'venues_in_city')).toBe(false)
+    const similar = events.find((e) => e.step === 'similar_artists_result')?.plan?.similarArtists ?? []
+    expect(similar.map((a: { name: string }) => a.name)).toEqual(['Julian Casablancas', 'Albert Hammond Jr.', 'The Voidz'])
   })
 
   test('demo payload stays well under the old ~134 KB', async () => {

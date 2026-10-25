@@ -3278,5 +3278,519 @@
       },
       "duration": 41
     }
+  },
+  "profiles": {
+    "mock-artist-radiohead": {
+      "explainability": [
+        {
+          "entity_id": "mock-artist-radiohead",
+          "score": 0.62
+        },
+        {
+          "entity_id": "mock-artist-thom-yorke",
+          "score": 0.21
+        },
+        {
+          "entity_id": "mock-artist-portishead",
+          "score": 0.11
+        },
+        {
+          "entity_id": "mock-artist-interpol",
+          "score": 0.06
+        }
+      ]
+    },
+    "mock-artist-the-strokes": {
+      "explainability": [
+        {
+          "entity_id": "mock-artist-the-strokes",
+          "score": 0.64
+        },
+        {
+          "entity_id": "mock-artist-julian-casablancas",
+          "score": 0.19
+        },
+        {
+          "entity_id": "mock-artist-albert-hammond-jr",
+          "score": 0.11
+        },
+        {
+          "entity_id": "mock-artist-the-voidz",
+          "score": 0.06
+        }
+      ],
+      "similarArtists": [
+        {
+          "entity_id": "mock-artist-julian-casablancas",
+          "name": "Julian Casablancas",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.93
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:indie_rock",
+              "name": "Indie Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_rock"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:garage_rock",
+              "name": "Garage Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:garage_rock"
+            }
+          ]
+        },
+        {
+          "entity_id": "mock-artist-albert-hammond-jr",
+          "name": "Albert Hammond Jr.",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.88
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:garage_rock",
+              "name": "Garage Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:garage_rock"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:indie_rock",
+              "name": "Indie Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_rock"
+            }
+          ]
+        },
+        {
+          "entity_id": "mock-artist-the-voidz",
+          "name": "The Voidz",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.81
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:post_punk_revival",
+              "name": "Post-Punk Revival",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:post_punk_revival"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:garage_rock",
+              "name": "Garage Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:garage_rock"
+            }
+          ]
+        }
+      ],
+      "brand": [
+        {
+          "entity_id": "mock-brand-converse",
+          "name": "Converse",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.86
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-brand-epiphone",
+          "name": "Epiphone",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.82
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-brand-ray-ban",
+          "name": "Ray-Ban",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.78
+          },
+          "tags": []
+        }
+      ],
+      "movie": [
+        {
+          "entity_id": "mock-movie-lost-in-translation",
+          "name": "Lost in Translation",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.84
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-movie-the-royal-tenenbaums",
+          "name": "The Royal Tenenbaums",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.8
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-movie-submarine",
+          "name": "Submarine",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.76
+          },
+          "tags": []
+        }
+      ]
+    },
+    "mock-artist-big-thief": {
+      "explainability": [
+        {
+          "entity_id": "mock-artist-big-thief",
+          "score": 0.61
+        },
+        {
+          "entity_id": "mock-artist-adrianne-lenker",
+          "score": 0.23
+        },
+        {
+          "entity_id": "mock-artist-buck-meek",
+          "score": 0.1
+        },
+        {
+          "entity_id": "mock-artist-florist",
+          "score": 0.06
+        }
+      ],
+      "similarArtists": [
+        {
+          "entity_id": "mock-artist-adrianne-lenker",
+          "name": "Adrianne Lenker",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.94
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:indie_folk",
+              "name": "Indie Folk",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_folk"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:indie_rock",
+              "name": "Indie Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_rock"
+            }
+          ]
+        },
+        {
+          "entity_id": "mock-artist-buck-meek",
+          "name": "Buck Meek",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.86
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:indie_folk",
+              "name": "Indie Folk",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_folk"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:indie_rock",
+              "name": "Indie Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_rock"
+            }
+          ]
+        },
+        {
+          "entity_id": "mock-artist-florist",
+          "name": "Florist",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.79
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:indie_rock",
+              "name": "Indie Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_rock"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:indie_folk",
+              "name": "Indie Folk",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_folk"
+            }
+          ]
+        }
+      ],
+      "brand": [
+        {
+          "entity_id": "mock-brand-martin",
+          "name": "Martin",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.87
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-brand-patagonia",
+          "name": "Patagonia",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.83
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-brand-field-notes",
+          "name": "Field Notes",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.79
+          },
+          "tags": []
+        }
+      ],
+      "movie": [
+        {
+          "entity_id": "mock-movie-wendy-and-lucy",
+          "name": "Wendy and Lucy",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.85
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-movie-old-joy",
+          "name": "Old Joy",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.81
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-movie-certain-women",
+          "name": "Certain Women",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.77
+          },
+          "tags": []
+        }
+      ]
+    },
+    "mock-artist-khruangbin": {
+      "explainability": [
+        {
+          "entity_id": "mock-artist-khruangbin",
+          "score": 0.66
+        },
+        {
+          "entity_id": "mock-artist-men-i-trust",
+          "score": 0.18
+        },
+        {
+          "entity_id": "mock-artist-toro-y-moi",
+          "score": 0.09
+        },
+        {
+          "entity_id": "mock-artist-stereolab",
+          "score": 0.07
+        }
+      ],
+      "similarArtists": [
+        {
+          "entity_id": "mock-artist-men-i-trust",
+          "name": "Men I Trust",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.91
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:psychedelic",
+              "name": "Psychedelic",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:psychedelic"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:indie_rock",
+              "name": "Indie Rock",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:indie_rock"
+            }
+          ]
+        },
+        {
+          "entity_id": "mock-artist-toro-y-moi",
+          "name": "Toro y Moi",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.84
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:funk",
+              "name": "Funk",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:funk"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:psychedelic",
+              "name": "Psychedelic",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:psychedelic"
+            }
+          ]
+        },
+        {
+          "entity_id": "mock-artist-stereolab",
+          "name": "Stereolab",
+          "type": "urn:entity",
+          "subtype": "urn:entity:artist",
+          "popularity": 0.8,
+          "query": {
+            "affinity": 0.77
+          },
+          "tags": [
+            {
+              "tag_id": "urn:tag:genre:music:psychedelic",
+              "name": "Psychedelic",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:psychedelic"
+            },
+            {
+              "tag_id": "urn:tag:genre:music:funk",
+              "name": "Funk",
+              "type": "urn:tag:genre:music",
+              "value": "urn:tag:genre:music:funk"
+            }
+          ]
+        }
+      ],
+      "brand": [
+        {
+          "entity_id": "mock-brand-teisco",
+          "name": "Teisco",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.86
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-brand-vans",
+          "name": "Vans",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.82
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-brand-polaroid",
+          "name": "Polaroid",
+          "type": "urn:entity",
+          "subtype": "urn:entity:brand",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.78
+          },
+          "tags": []
+        }
+      ],
+      "movie": [
+        {
+          "entity_id": "mock-movie-moonlight",
+          "name": "Moonlight",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.88
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-movie-paris-texas",
+          "name": "Paris, Texas",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.83
+          },
+          "tags": []
+        },
+        {
+          "entity_id": "mock-movie-chungking-express",
+          "name": "Chungking Express",
+          "type": "urn:entity",
+          "subtype": "urn:entity:movie",
+          "popularity": 0.75,
+          "query": {
+            "affinity": 0.79
+          },
+          "tags": []
+        }
+      ]
+    }
   }
 }

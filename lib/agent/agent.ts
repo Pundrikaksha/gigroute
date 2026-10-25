@@ -3,7 +3,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/chat/completio
 import { getLLMClient } from './llm'
 import { tools, executeTool, type ToolArgs } from './tools'
 import { getQlooClient, type QlooClient } from '../qloo'
-import { applyToolResult, createPlan, type Plan, type PlanInput } from './plan'
+import { applyToolResult, createPlan, NO_PLAN_STATUS, type Plan, type PlanInput } from './plan'
 
 const MAX_LLM_CALLS = 12
 
@@ -109,6 +109,12 @@ export async function runAgent(input: PlanInput, onEvent: (event: AgentEvent) =>
     if (outcomes[outcomes.length - 1]?.status === 'rejected') onEvent({ step: 'plan', text: 'Plan updated.', plan })
 
     if (options.stepDelayMs) await sleep(options.stepDelayMs)
+  }
+
+  // A resolved artist with no cities is a finished no-plan, not a tour that is still in progress.
+  if (plan.artist && plan.stops.length === 0) {
+    onEvent({ step: 'no_plan', text: NO_PLAN_STATUS, partial: finalResult, plan })
+    return finalResult
   }
 
   onEvent({ step: 'done', text: 'Planning complete.', partial: finalResult, plan })
