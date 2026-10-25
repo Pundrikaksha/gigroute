@@ -1,20 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { draftPitch, matchingTags, resolveDrivers, type Plan, type PlanStop } from '@/lib/agent/plan'
+import { matchingTags, pitchEmail, pitchText, resolveDrivers, type Plan, type PlanStop } from '@/lib/agent/plan'
 import type { QlooEntity } from '@/lib/qloo/types'
 import { AffinityBar, Skeleton, WhyPanel } from './ui'
 
 const PLACE_CATEGORY = 'urn:tag:category:place'
 
-function VenueRow({ plan, venue, pitch }: { plan: Plan; venue: QlooEntity; pitch: string }) {
+function VenueRow({ plan, stop, venue }: { plan: Plan; stop: PlanStop; venue: QlooEntity }) {
   const [copied, setCopied] = useState<'idle' | 'ok' | 'fail'>('idle')
   const kind = venue.tags.find((t) => t.type === PLACE_CATEGORY)?.name
   const matching = matchingTags(plan, venue.tags)
+  const pitch = pitchEmail(plan, stop, venue)
 
+  // Copy only: GigRoute never sends email or opens a mail client.
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(pitch)
+      await navigator.clipboard.writeText(pitchText(pitch))
       setCopied('ok')
     } catch {
       setCopied('fail')
@@ -32,7 +34,7 @@ function VenueRow({ plan, venue, pitch }: { plan: Plan; venue: QlooEntity; pitch
         <button
           type="button"
           onClick={copy}
-          className="shrink-0 rounded-md border border-zinc-600 px-2.5 py-1 text-xs font-medium text-zinc-100 hover:border-amber-400 hover:text-amber-200"
+          className="shrink-0 rounded-md border border-zinc-600 px-2.5 py-1 text-xs font-medium text-zinc-100 hover:border-amber-400 hover:text-amber-200 print:hidden"
         >
           {copied === 'ok' ? 'Copied' : copied === 'fail' ? 'Copy failed' : 'Copy pitch'}
           <span className="sr-only"> for {venue.name}</span>
@@ -61,12 +63,34 @@ function VenueRow({ plan, venue, pitch }: { plan: Plan; venue: QlooEntity; pitch
           />
         </div>
       </details>
+      <details className="group mt-1">
+        <summary className="text-xs font-medium text-amber-300 hover:text-amber-200">
+          <span aria-hidden="true" className="mr-1 inline-block transition-transform group-open:rotate-90">
+            ›
+          </span>
+          Pitch email draft
+        </summary>
+        <div className="mt-2 rounded-md border border-zinc-700 bg-zinc-950 p-3 text-xs text-zinc-200">
+          <p className="font-semibold text-zinc-100">Subject: {pitch.subject}</p>
+          <pre className="mt-2 whitespace-pre-wrap font-sans leading-relaxed">{pitch.body}</pre>
+          <p className="mt-2 text-zinc-500 print:hidden">Draft only. Copy it into your own mail client; GigRoute never sends email.</p>
+        </div>
+      </details>
     </li>
   )
 }
 
-export default function StopCard({ plan, stop, index }: { plan: Plan; stop: PlanStop; index: number }) {
-  const artistName = plan.artist?.name ?? plan.input.artist
+export default function StopCard({
+  plan,
+  stop,
+  index,
+  why,
+}: {
+  plan: Plan
+  stop: PlanStop
+  index: number
+  why?: string
+}) {
   const headingId = `stop-${index}`
 
   return (
@@ -86,6 +110,7 @@ export default function StopCard({ plan, stop, index }: { plan: Plan; stop: Plan
       <div className="mt-3">
         <AffinityBar value={stop.affinity} label="Affinity" />
       </div>
+      {why && <p className="mt-3 text-sm text-zinc-300">{why}</p>}
 
       <details className="group mt-3">
         <summary className="text-sm font-medium text-amber-300 hover:text-amber-200">
@@ -116,17 +141,8 @@ export default function StopCard({ plan, stop, index }: { plan: Plan; stop: Plan
         <p className="text-sm text-zinc-400">Qloo returned no venues for this city.</p>
       ) : (
         <ul className="space-y-2">
-          {stop.venues.map((v, i) => (
-            <VenueRow
-              key={v.id}
-              plan={plan}
-              venue={v}
-              pitch={
-                index === 0 && i === 0 && plan.pitch
-                  ? plan.pitch
-                  : draftPitch(v.name, artistName, matchingTags(plan, v.tags).map((t) => t.name).join(', '))
-              }
-            />
+          {stop.venues.map((v) => (
+            <VenueRow key={v.id} plan={plan} stop={stop} venue={v} />
           ))}
         </ul>
       )}

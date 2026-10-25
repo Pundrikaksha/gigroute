@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { planHref } from '@/lib/agent/plan'
 
 const inputClass =
   'w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-zinc-100 placeholder:text-zinc-500 hover:border-zinc-500'
@@ -15,10 +16,13 @@ export default function PlanForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const query = new URLSearchParams({ artist: artist.trim(), stops })
-    if (region.trim()) query.set('region', region.trim())
-    if (cities.trim()) query.set('cities', cities.trim())
-    router.push(`/plan?${query}`)
+    const href = planHref({
+      artist: artist.trim(),
+      region: region.trim() || undefined,
+      cities: cities.split(',').map((c) => c.trim()).filter(Boolean),
+      stops: Number(stops),
+    })
+    router.push(href)
   }
 
   return (

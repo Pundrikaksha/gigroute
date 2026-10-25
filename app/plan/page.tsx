@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { planToMarkdown, type Plan } from '@/lib/agent/plan'
+import { narrateTour, planFileName, planHref, planToJSON, planToMarkdown, type Plan } from '@/lib/agent/plan'
 import StopCard from '@/components/plan/StopCard'
 import { Skeleton, StopSkeleton, TagChips, pct } from '@/components/plan/ui'
 
@@ -33,6 +33,9 @@ const PHASES = [
 ] as const
 
 const DEMO_HREF = '/plan?artist=Radiohead&region=UK&stops=3&demo=1'
+const SUGGESTED_ARTISTS = ['Radiohead', 'Big Thief', 'Khruangbin']
+// Mirrors MOCK_REGIONS in lib/qloo/mock.ts (server-only), for the "no sample data here" notice.
+const MOCK_REGIONS = ['UK', 'USA']
 
 const buttonPrimary =
   'inline-flex items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-300'
@@ -186,17 +189,33 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
     return () => controller.abort()
   }, [artist, searchParams])
 
-  const exportMarkdown = () => {
+  const download = (format: 'md' | 'json') => {
     if (!plan) return
-    const blob = new Blob([planToMarkdown(plan)], { type: 'text/markdown' })
+    const origin = window.location.origin
+    const blob =
+      format === 'md'
+        ? new Blob([planToMarkdown(plan, origin)], { type: 'text/markdown' })
+        : new Blob([planToJSON(plan, origin)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `gigroute-${(plan.artist?.name ?? 'tour').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`
+    a.download = planFileName(plan, format)
     document.body.appendChild(a)
     a.click()
     a.remove()
     URL.revokeObjectURL(url)
+  }
+
+  const [linkCopied, setLinkCopied] = useState<'idle' | 'ok' | 'fail'>('idle')
+  const copyLink = async () => {
+    if (!plan) return
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}${planHref(plan.input)}`)
+      setLinkCopied('ok')
+    } catch {
+      setLinkCopied('fail')
+    }
+    setTimeout(() => setLinkCopied('idle'), 2500)
   }
 
   if (!artist) {
@@ -267,25 +286,86 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
     )
   } else if (status === 'done' && plan?.artistNotFound) {
     notice = (
-      <Notice tone="empty" title={`No match for “${artist}”`} actions={retryActions}>
-        Qloo doesn&apos;t know this artist yet. Try a different spelling, or enter a better-known artist your music
-        sounds like.
-        {mock && ' Mock mode only knows: Radiohead, The Strokes, Big Thief and Khruangbin.'}
+      <Notice
+        tone="empty"
+        title={`No match for “${artist}”`}
+        actions={
+          <>
+            <button type="button" onClick={onRetry} className={buttonPrimary}>
+              Retry
+            </button>
+            {SUGGESTED_ARTISTS.map((name) => {
+              const next = new URLSearchParams(searchParams)
+              next.set('artist', name)
+              return (
+                <Link key={name} href={`/plan?${next}`} className={buttonSecondary}>
+                  Try {name}
+                </Link>
+              )
+            })}
+            <Link href="/#plan-form" className={buttonSecondary}>
+              Edit search
+            </Link>
+          </>
+        }
+      >
+        Qloo doesn&apos;t know this artist yet. Check the spelling, or plan with a better-known artist your music
+        sounds like: the venues and cities that fit them will fit you too.
       </Notice>
     )
   } else if (status === 'done' && stops.length === 0) {
+    const region = searchParams.get('region')
+    const withRegion = (r: string | null) => {
+      const next = new URLSearchParams(searchParams)
+      if (r) next.set('region', r)
+      else next.delete('region')
+      next.delete('cities')
+      return `/plan?${next}`
+    }
     notice = (
-      <Notice tone="empty" title="No fan hotspots found" actions={retryActions}>
-        Qloo returned no cities for this taste{searchParams.get('region') ? ` in ${searchParams.get('region')}` : ''}.
-        Try a broader region or leave it blank.
+      <Notice
+        tone="empty"
+        title={region ? `No fan hotspots in ${region}` : 'No fan hotspots found'}
+        actions={
+          <>
+            {region && (
+              <Link href={withRegion(null)} className={buttonPrimary}>
+                Search everywhere
+              </Link>
+            )}
+            {mock &&
+              MOCK_REGIONS.filter((r) => r !== region).map((r) => (
+                <Link key={r} href={withRegion(r)} className={buttonSecondary}>
+                  Try {r}
+                </Link>
+              ))}
+            <Link href="/#plan-form" className={buttonSecondary}>
+              Edit search
+            </Link>
+          </>
+        }
+      >
+        {mock
+          ? `The built-in sample data only covers cities in the ${MOCK_REGIONS.join(' and ')}, so there is nothing to show${
+              region ? ` for ${region}` : ''
+            } yet. With a Qloo API key, GigRoute searches the live taste graph worldwide.`
+          : `Qloo returned no cities for this taste${region ? ` in ${region}` : ''}. Try a broader region or leave it blank.`}
       </Notice>
     )
   }
 
+  const narrative = plan && status === 'done' ? narrateTour(plan) : null
+
   return (
-    <div className="flex min-h-screen flex-col lg:h-screen lg:flex-row">
-      <main id="main" className="order-2 flex-1 overflow-y-auto p-4 sm:p-6 lg:order-1 lg:max-w-xl lg:border-r lg:border-zinc-800">
-        <nav className="mb-4 flex items-center justify-between text-sm">
+    <div className="flex min-h-screen flex-col lg:h-screen lg:flex-row print:block print:h-auto">
+      <main
+        id="main"
+        className="order-2 flex-1 overflow-y-auto p-4 sm:p-6 lg:order-1 lg:max-w-xl lg:border-r lg:border-zinc-800 print:max-w-none print:overflow-visible print:border-0 print:p-0"
+      >
+        <p className="mb-4 hidden text-xs print:block">
+          GigRoute tour plan{mock ? ' (sample data)' : ''} · {plan ? planHref(plan.input) : ''}
+        </p>
+        <nav className="mb-4 flex items-center justify-between text-sm print:hidden">
           <Link href="/" className="font-semibold text-zinc-100 hover:text-amber-200">
             ← GigRoute
           </Link>
@@ -304,10 +384,46 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
               <TagChips tags={plan.artist.tags} />
             </div>
           )}
-          {summary && status === 'done' && stops.length > 0 && <p className="mt-3 text-zinc-300">{summary}</p>}
+          {plan?.artist?.sampleOf && (
+            <p className="mt-3 rounded-lg border border-sky-400/40 bg-sky-400/10 px-3 py-2 text-sm text-sky-100">
+              <strong className="font-semibold">Sample data.</strong> {plan.artist.name} isn&apos;t in the built-in
+              fixtures, so this plan uses the <strong>{plan.artist.sampleOf}</strong> taste profile. With a Qloo API key
+              it would use {plan.artist.name}&apos;s real audience.
+            </p>
+          )}
+          {summary && status === 'done' && stops.length > 0 && (
+            <section aria-labelledby="summary-heading" className="mt-3">
+              <h2 id="summary-heading" className="sr-only">
+                Why this route
+              </h2>
+              <p className="text-zinc-300">{summary}</p>
+            </section>
+          )}
+          {status === 'done' && stops.length > 0 && plan && (
+            <div className="mt-4 flex flex-wrap gap-2 print:hidden">
+              <button type="button" onClick={copyLink} className={buttonSecondary}>
+                {linkCopied === 'ok' ? 'Link copied' : linkCopied === 'fail' ? 'Copy failed' : 'Copy share link'}
+              </button>
+              <button type="button" onClick={() => download('md')} className={buttonSecondary}>
+                Markdown
+              </button>
+              <button type="button" onClick={() => download('json')} className={buttonSecondary}>
+                JSON
+              </button>
+              <button type="button" onClick={() => window.print()} className={buttonSecondary}>
+                Print
+              </button>
+              <span role="status" className="sr-only">
+                {linkCopied === 'ok' ? 'Share link copied to clipboard' : linkCopied === 'fail' ? 'Could not copy' : ''}
+              </span>
+            </div>
+          )}
         </header>
 
-        <section aria-labelledby="progress-heading" className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+        <section
+          aria-labelledby="progress-heading"
+          className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4 print:hidden"
+        >
           <h2 id="progress-heading" className="mb-3 text-sm font-semibold text-zinc-200">
             {streaming ? 'Planning…' : status === 'error' ? 'Stopped' : 'Steps'}
           </h2>
@@ -340,15 +456,10 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
               <h2 id="stops-heading" className="text-xl font-bold text-zinc-50">
                 Stops{stops.length > 0 && ` (${stops.length})`}
               </h2>
-              {status === 'done' && stops.length > 0 && (
-                <button type="button" onClick={exportMarkdown} className={buttonSecondary}>
-                  Export itinerary
-                </button>
-              )}
             </div>
             <div className="space-y-4">
               {stops.map((stop, i) => (
-                <StopCard key={stop.city} plan={plan as Plan} stop={stop} index={i} />
+                <StopCard key={stop.city} plan={plan as Plan} stop={stop} index={i} why={narrative?.stops[i]?.text} />
               ))}
               {streaming && stops.length === 0 && (
                 <>
@@ -383,7 +494,7 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
 
       <aside
         aria-label="Tour route map"
-        className="order-1 h-72 shrink-0 border-b border-zinc-800 sm:h-96 lg:order-2 lg:h-auto lg:flex-1 lg:border-b-0"
+        className="order-1 h-72 shrink-0 border-b border-zinc-800 sm:h-96 lg:order-2 lg:h-auto lg:flex-1 lg:border-b-0 print:hidden"
       >
         {stops.some((s) => s.lat != null) ? (
           <Map stops={stops} routed={plan?.routed ?? false} />

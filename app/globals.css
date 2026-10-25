@@ -58,3 +58,22 @@ summary::-webkit-details-marker {
 .leaflet-container {
   background: #18181b;
 }
+
+/* Print-friendly plan: dark theme off, ink on paper, cards kept whole. */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+  *,
+  *::before,
+  *::after {
+    color: #000 !important;
+    background: transparent !important;
+    border-color: #d4d4d8 !important;
+    box-shadow: none !important;
+  }
+  article,
+  li {
+    break-inside: avoid;
+  }
+}
