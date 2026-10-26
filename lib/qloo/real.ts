@@ -16,6 +16,8 @@ import {
   normalizeEntity,
   similarArtistsParams,
   toSearchParams,
+  countryCodeFor,
+  venuesByGeocodeParams,
   venuesInCityParams,
 } from './requests'
 
@@ -107,8 +109,31 @@ export class RealQlooClient implements QlooClient {
     return this.entities(fanHotspotsParams(entityIds, region, take))
   }
 
-  venuesInCity(entityIds: string[], city: string, take?: number) {
-    return this.entities(venuesInCityParams(entityIds, city, take))
+  /**
+   * Venues in a city, kept inside the tour's country when the region is a known country.
+   * If the pinned locality query fails (400) or comes back empty, retry by exact geocoded city name.
+   * Results whose geocoded country differs from the tour's are dropped.
+   */
+  async venuesInCity(entityIds: string[], city: string, take?: number, region?: string) {
+    const code = countryCodeFor(region)
+    if (!code) return this.entities(venuesInCityParams(entityIds, city, take))
+    const inCountry = (list: QlooEntity[]) => list.filter((v) => !v.countryCode || v.countryCode.toUpperCase() === code)
+    let first: QlooEntity[] = []
+    let firstError: unknown
+    try {
+      first = inCountry(await this.entities(venuesInCityParams(entityIds, city, take, code)))
+    } catch (e) {
+      firstError = e
+    }
+    if (first.length > 0) return first
+    try {
+      const second = inCountry(await this.entities(venuesByGeocodeParams(entityIds, city, code, take)))
+      if (second.length > 0 || !firstError) return second
+    } catch {
+      // Fall through and report the first error, which names the original query.
+    }
+    if (firstError) throw firstError
+    return []
   }
 
   crossDomain(entityIds: string[], type: string, take?: number) {

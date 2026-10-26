@@ -108,7 +108,7 @@ export class MockLLM implements LLMClient {
       return this.text(`Qloo returned no fan hotspots for ${plan.artist.name}${plan.input.region ? ` in ${plan.input.region}` : ''}.`)
     }
     if (!done.has('venues_in_city')) {
-      return this.toolCalls(plan.stops.map((s) => ['venues_in_city', { entity_ids: ids, city: s.city }]))
+      return this.toolCalls(plan.stops.map((s) => ['venues_in_city', { entity_ids: ids, city: s.city, ...(plan.input.region ? { region: plan.input.region } : {}) }]))
     }
     if (!done.has('cross_domain_tastes')) {
       return this.toolCalls([
@@ -119,10 +119,11 @@ export class MockLLM implements LLMClient {
     if (!done.has('plan_route')) {
       return this.toolCalls([['plan_route', { stops: plan.stops.map((s) => s.city) }]])
     }
-    const topVenue = plan.stops[0]?.venues?.[0]
+    // The first routed stop can have no venues (e.g. its lookup failed), so pitch the first stop that has one.
+    const topVenue = plan.stops.find((s) => s.venues && s.venues.length > 0)?.venues?.[0]
     if (!done.has('draft_pitch') && topVenue) {
       const why = matchingTags(plan, topVenue.tags).map((t) => t.name).join(', ')
-      return this.toolCalls([['draft_pitch', { venue_name: topVenue.name, artist_name: plan.artist.name, why }]])
+      return this.toolCalls([['draft_pitch', { venue_name: topVenue.name, artist_name: plan.artist.name, why, ...(plan.artist.sampleOf ? { sample_of: plan.artist.sampleOf } : {}) }]])
     }
 
     return this.text(narrateTour(plan).summary)

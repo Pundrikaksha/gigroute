@@ -228,7 +228,9 @@ export class MockQlooClient implements QlooClient {
     return this.entities(fanHotspotsParams(entityIds, region, take))
   }
 
-  venuesInCity(entityIds: string[], city: string, take?: number) {
+  venuesInCity(entityIds: string[], city: string, take?: number, _region?: string) {
+    // Fixtures are keyed by city, so the region is not needed to disambiguate here.
+    void _region
     return this.entities(venuesInCityParams(entityIds, city, take))
   }
 

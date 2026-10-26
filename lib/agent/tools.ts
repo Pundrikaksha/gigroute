@@ -12,6 +12,8 @@ export interface ToolArgs {
   stops?: string[]
   venue_name?: string
   why?: string
+  /** Set when the plan runs on a sample taste profile, so the pitch does not claim the artist's own listeners. */
+  sample_of?: string
 }
 
 export const tools: ChatCompletionFunctionTool[] = [
@@ -70,6 +72,7 @@ export const tools: ChatCompletionFunctionTool[] = [
         properties: {
           entity_ids: { type: 'array', items: { type: 'string' } },
           city: { type: 'string' },
+          region: { type: 'string', description: 'The tour region/country, so the city is looked up in the right country.' },
         },
         required: ['entity_ids', 'city'],
       },
@@ -115,6 +118,7 @@ export const tools: ChatCompletionFunctionTool[] = [
           venue_name: { type: 'string' },
           artist_name: { type: 'string' },
           why: { type: 'string' },
+          sample_of: { type: 'string', description: 'Sample taste profile name, only when the plan uses sample data.' },
         },
         required: ['venue_name', 'artist_name'],
       },
@@ -138,7 +142,7 @@ export async function executeTool(name: string, args: ToolArgs, qloo: QlooClient
     case 'fan_hotspots':
       return await qloo.fanHotspots(entityIds, args.region)
     case 'venues_in_city':
-      return await qloo.venuesInCity(entityIds, args.city ?? '')
+      return await qloo.venuesInCity(entityIds, args.city ?? '', undefined, args.region)
     case 'cross_domain_tastes':
       return await qloo.crossDomain(entityIds, args.type ?? 'brand')
     case 'plan_route':
@@ -146,7 +150,7 @@ export async function executeTool(name: string, args: ToolArgs, qloo: QlooClient
       // For mock, just return the stops in order they came or random sort
       return args.stops ?? []
     case 'draft_pitch':
-      return draftPitch(args.venue_name ?? 'there', args.artist_name ?? 'our artist', args.why)
+      return draftPitch(args.venue_name ?? 'there', args.artist_name ?? 'our artist', args.why, args.sample_of)
     default:
       throw new Error(`Unknown tool: ${name}`)
   }

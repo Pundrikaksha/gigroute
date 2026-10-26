@@ -32,6 +32,39 @@ function signal(entityIds: string[]): string {
   return entityIds.filter(Boolean).join(',')
 }
 
+/**
+ * Region names Qloo's locality search does not resolve on its own. Live checks on 27 Oct 2026:
+ * "US" and "USA" returned no destinations, "United States" did.
+ */
+const REGION_QUERIES: Record<string, string> = {
+  us: 'United States',
+  usa: 'United States',
+  'u.s.': 'United States',
+  'u.s.a.': 'United States',
+  america: 'United States',
+  'united states of america': 'United States',
+}
+
+/** ISO 3166-1 alpha-2 codes for regions, used to keep venue lookups inside the touring country. */
+const COUNTRY_CODES: Record<string, string> = {
+  us: 'US', usa: 'US', 'u.s.': 'US', 'u.s.a.': 'US', america: 'US', 'united states': 'US', 'united states of america': 'US',
+  uk: 'GB', gb: 'GB', britain: 'GB', 'great britain': 'GB', england: 'GB', scotland: 'GB', wales: 'GB', 'united kingdom': 'GB',
+  india: 'IN', canada: 'CA', australia: 'AU', ireland: 'IE', germany: 'DE', france: 'FR', spain: 'ES', italy: 'IT',
+  netherlands: 'NL', japan: 'JP', mexico: 'MX', brazil: 'BR', 'new zealand': 'NZ', sweden: 'SE', norway: 'NO',
+}
+
+/** The locality query to send for a region, e.g. "US" -> "United States". Unknown regions pass through. */
+export function regionQuery(region: string): string {
+  const q = region.trim()
+  return REGION_QUERIES[q.toLowerCase()] ?? q
+}
+
+/** Two-letter country code for a region name or alias, or undefined when it is not a known country. */
+export function countryCodeFor(region?: string): string | undefined {
+  if (!region) return undefined
+  return COUNTRY_CODES[region.trim().toLowerCase()]
+}
+
 export function similarArtistsParams(entityIds: string[], take = 6): InsightsParams {
   return {
     'filter.type': ENTITY_TYPES.artist,
@@ -47,15 +80,36 @@ export function fanHotspotsParams(entityIds: string[], region?: string, take = 1
     'feature.explainability': true,
     take: clampTake(take),
   }
-  if (region) params['filter.location.query'] = region
+  if (region && region.trim()) params['filter.location.query'] = regionQuery(region)
   return params
 }
 
-export function venuesInCityParams(entityIds: string[], city: string, take = 5): InsightsParams {
-  return {
+/**
+ * Venues in one city. With a country code the city query is pinned to that country, so
+ * "Edinburgh" on a UK tour cannot resolve to Edinburgh, Indiana.
+ */
+export function venuesInCityParams(entityIds: string[], city: string, take = 5, countryCode?: string): InsightsParams {
+  const params: InsightsParams = {
     'filter.type': ENTITY_TYPES.place,
     'signal.interests.entities': signal(entityIds),
     'filter.location.query': city,
+    'feature.explainability': true,
+    take: clampTake(take),
+  }
+  if (countryCode) params['filter.geocode.country_code'] = countryCode
+  return params
+}
+
+/**
+ * Second try for a city whose locality query failed or resolved abroad: match the place's
+ * geocoded city name exactly inside the country instead of searching for a locality.
+ */
+export function venuesByGeocodeParams(entityIds: string[], city: string, countryCode: string, take = 5): InsightsParams {
+  return {
+    'filter.type': ENTITY_TYPES.place,
+    'signal.interests.entities': signal(entityIds),
+    'filter.geocode.name': city.split(',')[0].trim(),
+    'filter.geocode.country_code': countryCode,
     'feature.explainability': true,
     take: clampTake(take),
   }
@@ -95,11 +149,13 @@ export function normalizeEntity(raw: QlooApiEntity): QlooEntity {
     type: raw.subtype ?? raw.types?.[0] ?? raw.type ?? 'urn:entity',
     popularity: raw.popularity,
     affinity: raw.query?.affinity,
-    tags: (raw.tags ?? []).map(normalizeTag),
+    // Some live tags (e.g. urn:tag:voice_type:qloo) arrive with only a type and no name or id.
+    tags: (raw.tags ?? []).filter((t) => t && typeof t.name === 'string' && t.name.trim() !== '').map(normalizeTag),
     explainability,
     lat: raw.location?.lat,
     lng: raw.location?.lon,
     address: raw.properties?.address,
     description: raw.properties?.short_description,
+    countryCode: raw.properties?.geocode?.country_code,
   }
 }

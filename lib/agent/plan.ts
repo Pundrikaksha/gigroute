@@ -213,9 +213,10 @@ export function resolveDrivers(plan: Plan, entries: ExplainabilityEntry[]): Driv
 /** Tags on a venue or city that also describe the artist or its similar artists. */
 export function matchingTags(plan: Plan, tags: QlooTag[]): QlooTag[] {
   const taste = new Set<string>()
-  for (const t of plan.artist?.tags ?? []) taste.add(t.name.toLowerCase())
-  for (const a of plan.similarArtists) for (const t of a.tags) taste.add(t.name.toLowerCase())
-  return tags.filter((t) => taste.has(t.name.toLowerCase()))
+  const key = (t: QlooTag) => (typeof t?.name === 'string' ? t.name.toLowerCase() : '')
+  for (const t of plan.artist?.tags ?? []) if (key(t)) taste.add(key(t))
+  for (const a of plan.similarArtists) for (const t of a.tags ?? []) if (key(t)) taste.add(key(t))
+  return (tags ?? []).filter((t) => key(t) !== '' && taste.has(key(t)))
 }
 
 /** The entity IDs to signal on: the artist plus its top similar artists (drives explainability). */
@@ -224,8 +225,9 @@ export function signalEntityIds(plan: Plan, similarCount = 3): string[] {
   return [plan.artist.id, ...plan.similarArtists.slice(0, similarCount).map((a) => a.id)]
 }
 
-export function draftPitch(venue: string, artist: string, why?: string): string {
-  const reason = why ? ` Qloo taste data shows a strong overlap between our listeners and your regulars (${why}).` : ''
+export function draftPitch(venue: string, artist: string, why?: string, sampleOf?: string): string {
+  const audience = sampleOf ? `fans of similar artists (from ${tasteProfilePhrase(sampleOf)})` : 'our listeners'
+  const reason = why ? ` Qloo taste data shows a strong overlap between ${audience} and your regulars (${why}).` : ''
   return `Hi ${venue} booking team,\n\nI'm reaching out on behalf of ${artist}.${reason} We're routing a run through your city and would love to discuss a date.\n\nThanks!`
 }
 
