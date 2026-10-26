@@ -158,4 +158,19 @@ describe('venues far from their stop', () => {
     const next = applyToolResult(plan, 'venues_in_city', { city: 'Williamstown' }, [v('MA', 42.71, -73.21), v('KY', 38.64, -84.56)])
     expect(next.stops[0].venues?.map((x) => x.id)).toEqual(['MA'])
   })
+
+  test('drops a neighbouring town\'s venues but keeps named-city venues when stop coords are off', async () => {
+    const { applyToolResult } = await import('../lib/agent/plan')
+    let plan = createPlan({ artist: 'X', cities: [], stops: 2, demo: false })
+    // Live: Fort William's Qloo coords sit in London; Eastbourne's too.
+    plan = { ...plan, stops: [
+      { city: 'Fort William', lat: 51.49, lng: -0.22, tags: [], explainability: [], venues: null },
+      { city: 'Eastbourne', lat: 51.51, lng: -0.23, tags: [], explainability: [], venues: null },
+    ] } as typeof plan
+    const v = (id: string, lat: number, lng: number, address: string) => ({ id, name: id, type: 'urn:entity:place', tags: [], explainability: [], lat, lng, address, affinity: 0.5 })
+    const fw = applyToolResult(plan, 'venues_in_city', { city: 'Fort William' }, [v('ayr', 55.46, -4.63, 'High St Ayr KA7 1JX United Kingdom')])
+    expect(fw.stops[0].venues).toEqual([])
+    const eb = applyToolResult(plan, 'venues_in_city', { city: 'Eastbourne' }, [v('college', 50.76, 0.27, 'Old Wish Rd Eastbourne BN21 4JY United Kingdom')])
+    expect(eb.stops[1].venues?.map((x) => x.id)).toEqual(['college'])
+  })
 })

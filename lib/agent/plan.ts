@@ -169,15 +169,30 @@ export function applyToolResult(plan: Plan, tool: string, args: Record<string, u
 }
 
 /**
- * Same-name towns in one country (Williamstown MA vs KY) slip past the country filter, so drop
- * venues far from the stop. Generous on purpose: Qloo destination coordinates can be off by
- * hundreds of km (live: Fort William placed in London), and those stops must keep their venues.
+ * Qloo's city lookup can return venues from another town (same-name towns such as Williamstown
+ * MA vs KY, or a neighbouring city: live, the Fort William stop got Ayr venues). Keep a venue if
+ * it is close to the stop, or if its address names the stop's city and it is not absurdly far
+ * (Qloo destination coordinates can be off by hundreds of km: Eastbourne is placed in London).
  */
+export const NEAR_STOP_KM = 100
 export const MAX_VENUE_DISTANCE_KM = 800
 
 function isFarFromStop(venue: QlooEntity, stop?: PlanStop): boolean {
-  if (!stop || stop.lat == null || stop.lng == null || venue.lat == null || venue.lng == null) return false
-  return haversineKm({ lat: stop.lat, lng: stop.lng }, { lat: venue.lat, lng: venue.lng }) > MAX_VENUE_DISTANCE_KM
+  if (!stop) return false
+  const named = addressNamesCity(venue.address, stop.city)
+  if (stop.lat == null || stop.lng == null || venue.lat == null || venue.lng == null) {
+    return venue.address ? !named : false
+  }
+  const km = haversineKm({ lat: stop.lat, lng: stop.lng }, { lat: venue.lat, lng: venue.lng })
+  if (km <= NEAR_STOP_KM) return false
+  return !named || km > MAX_VENUE_DISTANCE_KM
+}
+
+function addressNamesCity(address: string | undefined, city: string): boolean {
+  if (!address) return false
+  const name = city.split(',')[0].trim().toLowerCase()
+  if (!name) return false
+  return ` ${address.toLowerCase().replace(/[^a-z0-9]+/g, ' ')} `.includes(` ${name.replace(/[^a-z0-9]+/g, ' ')} `)
 }
 
 function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
