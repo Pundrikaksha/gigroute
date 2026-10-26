@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { NO_PLAN_STATUS, narrateTour, planFileName, planHref, planToJSON, planToMarkdown, type Plan } from '@/lib/agent/plan'
+import { NO_PLAN_STATUS, narrateTour, planFileName, planHref, planToJSON, planToMarkdown, tasteProfilePhrase, type Plan } from '@/lib/agent/plan'
 import StopCard from '@/components/plan/StopCard'
 import { PHASES, PhaseList } from '@/components/plan/phases'
 import { Skeleton, StopSkeleton, TagChips, pct } from '@/components/plan/ui'
@@ -360,7 +360,7 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
           {plan?.artist?.sampleOf && (
             <p className="mt-3 rounded-lg border border-sky-400/40 bg-sky-400/10 px-3 py-2 text-sm text-sky-100">
               <strong className="font-semibold">Sample data.</strong> {plan.artist.name} isn&apos;t in the built-in
-              fixtures, so this plan uses the <strong>{plan.artist.sampleOf}</strong> taste profile. With a Qloo API key
+              fixtures, so this plan uses <strong>{tasteProfilePhrase(plan.artist.sampleOf)}</strong>. With a Qloo API key
               it would use {plan.artist.name}&apos;s real audience.
             </p>
           )}

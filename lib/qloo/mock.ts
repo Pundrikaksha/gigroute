@@ -9,6 +9,7 @@ import type {
   QlooTag,
   QlooTagsResponse,
 } from './types'
+import { tasteProfilePhrase } from '../agent/plan'
 import {
   clampTake,
   crossDomainParams,
@@ -124,7 +125,7 @@ export function sampleArtist(name: string): QlooEntity {
       ...profile,
       entity_id: id,
       name,
-      properties: { short_description: `Sample data: mapped onto the ${profile.name} taste profile.` },
+      properties: { short_description: `Sample data: mapped onto ${tasteProfilePhrase(profile.name)}.` },
     }),
     sampleOf: profile.name,
     sampleProfileId: profile.entity_id,
