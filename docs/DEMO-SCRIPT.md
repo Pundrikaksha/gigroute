@@ -2,7 +2,7 @@
 
 **Setup before recording:** open https://gigroute.vercel.app in a clean browser window at 1440×900 or larger, zoom 100%, signed out, no extensions in view. Clear the form. Have a plain text editor open in a second window for the export moment. Run the demo once beforehand so fonts and map tiles are cached.
 
-**Tone:** calm, concrete, one idea per sentence. Say "sample data" whenever it's on screen; don't imply live Qloo results if the key isn't configured.
+**Tone:** calm, concrete, one idea per sentence. Say "sample data" only when the blue "Sample data" note is on screen (the sample tour button). Typed artists run on the live Qloo API.
 
 | Time | On screen | Voice-over |
 | --- | --- | --- |
@@ -13,7 +13,7 @@
 | 0:50–1:05 | Point at the summary paragraph, then the first stop's "why" sentence. Expand **Why this city?** | "The summary isn't fluff. London scores 96%, and explainability says it's driven mostly by fans of Radiohead and Thom Yorke. Each stop says which tags it shares with your sound." |
 | 1:05–1:20 | In the first stop, expand **Why this venue?**, then **Pitch email draft**. Click **Copy pitch**. | "Same for every room. And every venue gets a pitch draft that leads with the evidence: the affinity, the shared tags, a co-bill who draws the same crowd. It's copy only. GigRoute never sends email for you." |
 | 1:20–1:32 | Click **Copy share link**, then **Markdown**; show the downloaded file briefly in the editor. Click **Print** and cancel the dialog after the preview shows. | "The link is the plan: share it and it re-runs. Export Markdown or JSON, or print it for the van." |
-| 1:32–1:50 | Click **← GigRoute**, type "Phoebe Bridgers", region "USA", 3 stops, **Plan my tour**. Point at the blue "Sample data" note. | "Try your own artist. In sample mode, artists outside the fixtures are mapped onto a sample taste profile, and it says so. With the Qloo key set, this is that artist's real audience." |
+| 1:32–1:50 | Click **← GigRoute**, type "Phoebe Bridgers", region "United States", 3 stops, **Plan my tour**. Let the first stops and venues stream in. | "Now a real query. This is live Qloo data: Phoebe Bridgers' actual fan hotspots and the rooms her audience goes to, with the same evidence behind every pick." |
 | 1:50–2:00 | Back to the landing page hero, or the map of the finished plan. | "GigRoute: taste-grounded tour planning for the bands who need it most. Built on Qloo." |
 
 **Backup lines if something is slow:** "The plan streams step by step, so you can read the first city while the rest arrive." If the map tiles are slow, keep talking over the stop cards; they don't depend on the map.

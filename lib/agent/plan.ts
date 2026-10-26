@@ -131,8 +131,11 @@ export function applyToolResult(plan: Plan, tool: string, args: Record<string, u
     case 'venues_in_city': {
       if (!isEntityList(result)) return plan
       const city = String(args.city ?? '')
-      const venues = [...result].sort((a, b) => (b.affinity ?? 0) - (a.affinity ?? 0))
       const idx = plan.stops.findIndex((s) => sameCity(s.city, city))
+      const near = idx === -1 ? undefined : plan.stops[idx]
+      const venues = [...result]
+        .filter((v) => !isFarFromStop(v, near))
+        .sort((a, b) => (b.affinity ?? 0) - (a.affinity ?? 0))
       if (idx === -1) {
         const stop: PlanStop = { city, tags: [], explainability: [], venues, ...centroid(venues) }
         return { ...plan, stops: [...plan.stops, stop] }
@@ -163,6 +166,18 @@ export function applyToolResult(plan: Plan, tool: string, args: Record<string, u
     default:
       return plan
   }
+}
+
+/**
+ * Same-name towns in one country (Williamstown MA vs KY) slip past the country filter, so drop
+ * venues far from the stop. Generous on purpose: Qloo destination coordinates can be off by
+ * hundreds of km (live: Fort William placed in London), and those stops must keep their venues.
+ */
+export const MAX_VENUE_DISTANCE_KM = 800
+
+function isFarFromStop(venue: QlooEntity, stop?: PlanStop): boolean {
+  if (!stop || stop.lat == null || stop.lng == null || venue.lat == null || venue.lng == null) return false
+  return haversineKm({ lat: stop.lat, lng: stop.lng }, { lat: venue.lat, lng: venue.lng }) > MAX_VENUE_DISTANCE_KM
 }
 
 function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
