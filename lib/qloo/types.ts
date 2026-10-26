@@ -96,6 +96,8 @@ export interface QlooEntity {
   lng?: number
   address?: string
   description?: string
+  /** ISO country code from properties.geocode, when Qloo returns it. */
+  countryCode?: string
   /** Mock mode only: the fixture taste profile an unknown artist was mapped onto. */
   sampleOf?: string
   /** Mock mode only: fixture entity id of the profile named by sampleOf. */
@@ -112,6 +114,6 @@ export interface QlooClient {
   // Helpers on top of insights:
   similarArtists(entityIds: string[], take?: number): Promise<QlooEntity[]>
   fanHotspots(entityIds: string[], region?: string, take?: number): Promise<QlooEntity[]>
-  venuesInCity(entityIds: string[], city: string, take?: number): Promise<QlooEntity[]>
+  venuesInCity(entityIds: string[], city: string, take?: number, region?: string): Promise<QlooEntity[]>
   crossDomain(entityIds: string[], type: string, take?: number): Promise<QlooEntity[]>
 }

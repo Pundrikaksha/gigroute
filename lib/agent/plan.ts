@@ -213,9 +213,10 @@ export function resolveDrivers(plan: Plan, entries: ExplainabilityEntry[]): Driv
 /** Tags on a venue or city that also describe the artist or its similar artists. */
 export function matchingTags(plan: Plan, tags: QlooTag[]): QlooTag[] {
   const taste = new Set<string>()
-  for (const t of plan.artist?.tags ?? []) taste.add(t.name.toLowerCase())
-  for (const a of plan.similarArtists) for (const t of a.tags) taste.add(t.name.toLowerCase())
-  return tags.filter((t) => taste.has(t.name.toLowerCase()))
+  const key = (t: QlooTag) => (typeof t?.name === 'string' ? t.name.toLowerCase() : '')
+  for (const t of plan.artist?.tags ?? []) if (key(t)) taste.add(key(t))
+  for (const a of plan.similarArtists) for (const t of a.tags ?? []) if (key(t)) taste.add(key(t))
+  return (tags ?? []).filter((t) => key(t) !== '' && taste.has(key(t)))
 }
 
 /** The entity IDs to signal on: the artist plus its top similar artists (drives explainability). */

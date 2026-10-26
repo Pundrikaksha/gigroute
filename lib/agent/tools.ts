@@ -70,6 +70,7 @@ export const tools: ChatCompletionFunctionTool[] = [
         properties: {
           entity_ids: { type: 'array', items: { type: 'string' } },
           city: { type: 'string' },
+          region: { type: 'string', description: 'The tour region/country, so the city is looked up in the right country.' },
         },
         required: ['entity_ids', 'city'],
       },
@@ -138,7 +139,7 @@ export async function executeTool(name: string, args: ToolArgs, qloo: QlooClient
     case 'fan_hotspots':
       return await qloo.fanHotspots(entityIds, args.region)
     case 'venues_in_city':
-      return await qloo.venuesInCity(entityIds, args.city ?? '')
+      return await qloo.venuesInCity(entityIds, args.city ?? '', undefined, args.region)
     case 'cross_domain_tastes':
       return await qloo.crossDomain(entityIds, args.type ?? 'brand')
     case 'plan_route':
