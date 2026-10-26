@@ -128,3 +128,13 @@ describe('RealQlooClient.venuesInCity with a region', () => {
     expect(params(urls[0])).not.toHaveProperty('filter.geocode.country_code')
   })
 })
+
+describe('draft_pitch on sample data', () => {
+  test('does not claim "our listeners" for a sample profile', async () => {
+    const { draftPitch } = await import('../lib/agent/plan')
+    const sample = draftPitch('O2 Academy Brixton', 'Arijit Singh', 'Indie Rock', 'The Strokes')
+    expect(sample).not.toContain('our listeners')
+    expect(sample).toContain('fans of similar artists (from The Strokes taste profile)')
+    expect(draftPitch('O2 Academy Brixton', 'Radiohead', 'Indie Rock')).toContain('our listeners')
+  })
+})

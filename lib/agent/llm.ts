@@ -123,7 +123,7 @@ export class MockLLM implements LLMClient {
     const topVenue = plan.stops.find((s) => s.venues && s.venues.length > 0)?.venues?.[0]
     if (!done.has('draft_pitch') && topVenue) {
       const why = matchingTags(plan, topVenue.tags).map((t) => t.name).join(', ')
-      return this.toolCalls([['draft_pitch', { venue_name: topVenue.name, artist_name: plan.artist.name, why }]])
+      return this.toolCalls([['draft_pitch', { venue_name: topVenue.name, artist_name: plan.artist.name, why, ...(plan.artist.sampleOf ? { sample_of: plan.artist.sampleOf } : {}) }]])
     }
 
     return this.text(narrateTour(plan).summary)

@@ -225,8 +225,9 @@ export function signalEntityIds(plan: Plan, similarCount = 3): string[] {
   return [plan.artist.id, ...plan.similarArtists.slice(0, similarCount).map((a) => a.id)]
 }
 
-export function draftPitch(venue: string, artist: string, why?: string): string {
-  const reason = why ? ` Qloo taste data shows a strong overlap between our listeners and your regulars (${why}).` : ''
+export function draftPitch(venue: string, artist: string, why?: string, sampleOf?: string): string {
+  const audience = sampleOf ? `fans of similar artists (from ${tasteProfilePhrase(sampleOf)})` : 'our listeners'
+  const reason = why ? ` Qloo taste data shows a strong overlap between ${audience} and your regulars (${why}).` : ''
   return `Hi ${venue} booking team,\n\nI'm reaching out on behalf of ${artist}.${reason} We're routing a run through your city and would love to discuss a date.\n\nThanks!`
 }
 

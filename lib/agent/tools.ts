@@ -12,6 +12,8 @@ export interface ToolArgs {
   stops?: string[]
   venue_name?: string
   why?: string
+  /** Set when the plan runs on a sample taste profile, so the pitch does not claim the artist's own listeners. */
+  sample_of?: string
 }
 
 export const tools: ChatCompletionFunctionTool[] = [
@@ -116,6 +118,7 @@ export const tools: ChatCompletionFunctionTool[] = [
           venue_name: { type: 'string' },
           artist_name: { type: 'string' },
           why: { type: 'string' },
+          sample_of: { type: 'string', description: 'Sample taste profile name, only when the plan uses sample data.' },
         },
         required: ['venue_name', 'artist_name'],
       },
@@ -147,7 +150,7 @@ export async function executeTool(name: string, args: ToolArgs, qloo: QlooClient
       // For mock, just return the stops in order they came or random sort
       return args.stops ?? []
     case 'draft_pitch':
-      return draftPitch(args.venue_name ?? 'there', args.artist_name ?? 'our artist', args.why)
+      return draftPitch(args.venue_name ?? 'there', args.artist_name ?? 'our artist', args.why, args.sample_of)
     default:
       throw new Error(`Unknown tool: ${name}`)
   }
