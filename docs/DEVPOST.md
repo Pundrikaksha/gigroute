@@ -2,9 +2,9 @@
 
 **Tagline:** Route your next tour to where your fans already are.
 
-**Links:** live demo https://gigroute.vercel.app · repository (private until submission)
+**Links:** live demo https://gigroute.vercel.app · repository https://github.com/Pundrikaksha/gigroute (MIT)
 
-> **Honesty note for judges:** the public demo currently runs on **hand-written sample data** (mock mode) because the Qloo API key had not been configured on the deployment when this was written. The sample data copies the documented Qloo response shapes, every screen labels it "Sample data", and the real client is already wired up: setting `QLOO_API_KEY` is the only change needed to go live. `npm run contract-check` verifies the live API against the fields GigRoute reads.
+> **Note for judges:** the public demo runs on the **live Qloo API**. Typed artists are resolved and planned from real Qloo data. The "See a sample tour" button is the exception: it is a fixed Radiohead UK run on hand-written sample data, labelled "Sample data" on screen. `npm run contract-check` verifies the live API against the fields GigRoute reads.
 
 ## Inspiration
 
@@ -40,7 +40,7 @@ Enter your artist (or a better-known artist you sound like), optionally a region
 | `GET /search` (`types=urn:entity:artist`) | Resolves the typed artist to an entity ID; ambiguous names ask the user to pick. |
 | `/v2/insights` `filter.type=urn:entity:artist` | Similar artists for co-bills, and extra taste signals. |
 | `/v2/insights` `filter.type=urn:entity:destination` (+ `filter.location.query`) | Fan hotspots: cities where the taste over-indexes, optionally within a region. |
-| `/v2/insights` `filter.type=urn:entity:place` (+ `filter.location.query=<city>`) | Venues, bars and record shops per city, ranked by affinity. |
+| `/v2/insights` `filter.type=urn:entity:place` (+ `filter.location.query=<city>`, `filter.geocode.country_code`) | Venues, bars and record shops per city, ranked by affinity and kept inside the tour's country (with `filter.geocode.name` as a fallback). |
 | `signal.interests.entities` | The artist **plus its top three similar artists** are sent together, so results reflect a scene rather than one name. |
 | `feature.explainability=true` | Per-result breakdown of which of those artists drove the score ("driven by fans of Radiohead 62%, Thom Yorke 21%"). |
 | `query.affinity` | The score behind every ranking, bar and sentence in the narration. |
@@ -53,6 +53,7 @@ Only artist names, entity IDs and place names are sent. No personal data. Affini
 ## Challenges we ran into
 
 - **Making explainability legible.** Raw per-entity scores mean little to a musician, so we resolve entity IDs back to names from the plan and turn them into "driven by fans of…" sentences and pitch evidence.
+- **Real-world geography.** City names are ambiguous: on the live API "Edinburgh" first resolved to Edinburgh, Indiana. Venue lookups are now pinned to the tour's country, with fallbacks, and "US" is sent as "United States".
 - **Building and demoing before the key arrived.** We wrote fixtures that mirror the documented response shapes, made the mock client interpret the same parameters as the real one, and added a contract check to run the moment the key lands. We also made sure judges typing *any* artist get a full, clearly labelled sample plan instead of a dead end.
 - **Streaming without bloat.** Early versions resent every raw tool result in every event (about 134 KB for the demo). Folding results into one plan snapshot per step roughly halved that.
 - **Keeping an LLM honest.** The agent may only cite tool results, and the closing narration is generated from the plan itself, so numbers in the text always match numbers on screen.
@@ -72,7 +73,7 @@ Only artist names, entity IDs and place names are sent. No personal data. Affini
 
 ## What's next for GigRoute
 
-- Run on the live Qloo API and tune `take`, region handling and the similar-artist signal mix against real responses.
+- Venue-type filtering with Qloo tags, so shortlists favour music rooms over restaurants and parks, and further tuning of `take` and the similar-artist signal mix against live responses.
 - Dates and logistics: drive-time routing, day-of-week patterns, and avoiding clashes.
 - Demographic and age-band signals to choose between all-ages rooms and bars.
 - Saved tours and a booker CRM (with explicit consent, still no auto-sending).

@@ -16,6 +16,7 @@ import {
   normalizeEntity,
   similarArtistsParams,
   toSearchParams,
+  cityInCountry,
   countryCodeFor,
   venuesByGeocodeParams,
   venuesInCityParams,
@@ -118,21 +119,26 @@ export class RealQlooClient implements QlooClient {
     const code = countryCodeFor(region)
     if (!code) return this.entities(venuesInCityParams(entityIds, city, take))
     const inCountry = (list: QlooEntity[]) => list.filter((v) => !v.countryCode || v.countryCode.toUpperCase() === code)
-    let first: QlooEntity[] = []
+    // Tried in order until one returns venues in the country. Live 27 Oct: "Edinburgh" resolved to
+    // Indiana (empty once pinned to GB) and the exact geocode name also came back empty, so the
+    // "City, Country" locality query sits in between.
+    const attempts = [
+      venuesInCityParams(entityIds, city, take, code),
+      venuesInCityParams(entityIds, cityInCountry(city, code), take, code),
+      venuesByGeocodeParams(entityIds, city, code, take),
+    ]
     let firstError: unknown
-    try {
-      first = inCountry(await this.entities(venuesInCityParams(entityIds, city, take, code)))
-    } catch (e) {
-      firstError = e
+    let succeeded = false
+    for (const params of attempts) {
+      try {
+        const venues = inCountry(await this.entities(params))
+        succeeded = true
+        if (venues.length > 0) return venues
+      } catch (e) {
+        firstError ??= e
+      }
     }
-    if (first.length > 0) return first
-    try {
-      const second = inCountry(await this.entities(venuesByGeocodeParams(entityIds, city, code, take)))
-      if (second.length > 0 || !firstError) return second
-    } catch {
-      // Fall through and report the first error, which names the original query.
-    }
-    if (firstError) throw firstError
+    if (!succeeded && firstError) throw firstError
     return []
   }
 

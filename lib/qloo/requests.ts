@@ -53,6 +53,19 @@ const COUNTRY_CODES: Record<string, string> = {
   netherlands: 'NL', japan: 'JP', mexico: 'MX', brazil: 'BR', 'new zealand': 'NZ', sweden: 'SE', norway: 'NO',
 }
 
+const COUNTRY_NAMES: Record<string, string> = {
+  US: 'United States', GB: 'United Kingdom', IN: 'India', CA: 'Canada', AU: 'Australia', IE: 'Ireland', DE: 'Germany',
+  FR: 'France', ES: 'Spain', IT: 'Italy', NL: 'Netherlands', JP: 'Japan', MX: 'Mexico', BR: 'Brazil', NZ: 'New Zealand',
+  SE: 'Sweden', NO: 'Norway',
+}
+
+/** "Edinburgh" + "GB" -> "Edinburgh, United Kingdom", so the locality search prefers the right country. */
+export function cityInCountry(city: string, countryCode: string): string {
+  const name = COUNTRY_NAMES[countryCode]
+  const base = city.split(',')[0].trim()
+  return name ? `${base}, ${name}` : base
+}
+
 /** The locality query to send for a region, e.g. "US" -> "United States". Unknown regions pass through. */
 export function regionQuery(region: string): string {
   const q = region.trim()

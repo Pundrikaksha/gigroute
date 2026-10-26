@@ -101,24 +101,33 @@ describe('RealQlooClient.venuesInCity with a region', () => {
     expect(urls).toHaveLength(1)
   })
 
-  test('empty pinned result retries by geocoded city name in the country', async () => {
-    const urls = stubSequence([ok([]), ok([place('P3', 'Inverness', 'GB')])])
+  test('empty pinned result retries with "City, Country", then by geocoded city name', async () => {
+    const urls = stubSequence([ok([]), ok([]), ok([place('P3', 'Inverness', 'GB')])])
     const venues = await new RealQlooClient().venuesInCity(['A1'], 'Inverness', 5, 'United Kingdom')
-    expect(urls).toHaveLength(2)
-    expect(params(urls[1])).toMatchObject({ 'filter.geocode.name': 'Inverness', 'filter.geocode.country_code': 'GB' })
-    expect(params(urls[1])).not.toHaveProperty('filter.location.query')
+    expect(urls).toHaveLength(3)
+    expect(params(urls[1])).toMatchObject({ 'filter.location.query': 'Inverness, United Kingdom', 'filter.geocode.country_code': 'GB' })
+    expect(params(urls[2])).toMatchObject({ 'filter.geocode.name': 'Inverness', 'filter.geocode.country_code': 'GB' })
+    expect(params(urls[2])).not.toHaveProperty('filter.location.query')
     expect(venues.map((v) => v.id)).toEqual(['P3'])
+  })
+
+  test('"City, Country" attempt stops the chain when it finds venues', async () => {
+    const urls = stubSequence([ok([]), ok([place('P6', 'Edinburgh', 'GB')])])
+    const venues = await new RealQlooClient().venuesInCity(['A1'], 'Edinburgh', 5, 'UK')
+    expect(urls).toHaveLength(2)
+    expect(venues.map((v) => v.id)).toEqual(['P6'])
   })
 
   test('a 400 on the locality query falls back to the geocode lookup', async () => {
     const urls = stubSequence([{ status: 400, body: { error: 'no locality' } }, ok([place('P4', 'Aviemore', 'GB')])])
     const venues = await new RealQlooClient().venuesInCity(['A1'], 'Aviemore', 5, 'UK')
     expect(urls).toHaveLength(2)
+    expect(params(urls[1])['filter.location.query']).toBe('Aviemore, United Kingdom')
     expect(venues.map((v) => v.id)).toEqual(['P4'])
   })
 
   test('if both lookups fail the original error is raised', async () => {
-    stubSequence([{ status: 400, body: {} }, { status: 400, body: {} }])
+    stubSequence([{ status: 400, body: {} }])
     await expect(new RealQlooClient().venuesInCity(['A1'], 'Nowhere', 5, 'UK')).rejects.toThrow(/400/)
   })
 
@@ -136,5 +145,17 @@ describe('draft_pitch on sample data', () => {
     expect(sample).not.toContain('our listeners')
     expect(sample).toContain('fans of similar artists (from The Strokes taste profile)')
     expect(draftPitch('O2 Academy Brixton', 'Radiohead', 'Indie Rock')).toContain('our listeners')
+  })
+})
+
+describe('venues far from their stop', () => {
+  test('applyToolResult drops venues more than MAX_VENUE_DISTANCE_KM from the stop', async () => {
+    const { applyToolResult, MAX_VENUE_DISTANCE_KM } = await import('../lib/agent/plan')
+    expect(MAX_VENUE_DISTANCE_KM).toBe(800)
+    let plan = createPlan({ artist: 'X', cities: [], stops: 1, demo: false })
+    plan = { ...plan, stops: [{ city: 'Williamstown', lat: 42.71, lng: -73.2, tags: [], explainability: [], venues: null }] } as typeof plan
+    const v = (id: string, lat: number, lng: number) => ({ id, name: id, type: 'urn:entity:place', tags: [], explainability: [], lat, lng, affinity: 0.5 })
+    const next = applyToolResult(plan, 'venues_in_city', { city: 'Williamstown' }, [v('MA', 42.71, -73.21), v('KY', 38.64, -84.56)])
+    expect(next.stops[0].venues?.map((x) => x.id)).toEqual(['MA'])
   })
 })
