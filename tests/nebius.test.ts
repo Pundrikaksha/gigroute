@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest'
-import { polishSummary, NEBIUS_DEFAULTS, trimToSentences } from '../lib/agent/nebius'
+import { polishSummary, NEBIUS_DEFAULTS, trimToSentences, stripMetaSentences } from '../lib/agent/nebius'
 import { type Plan } from '../lib/agent/plan'
 
 vi.mock('server-only', () => ({}))
@@ -224,6 +224,34 @@ describe('polishSummary', () => {
   test('trimToSentences strips rule-echo sentence at the end', () => {
     const text = 'Here is the summary. No additional details beyond the provided facts were used.'
     expect(trimToSentences(text)).toBe('Here is the summary.')
+  })
+
+  test('stripMetaSentences drops rule-echo sentences anywhere in the reply', () => {
+    const text =
+      'A 3-stop run for Radiohead covers London, Bristol and Manchester. No invented details; all facts derived solely from input. Fans lean Art Rock.'
+    expect(stripMetaSentences(text)).toBe('A 3-stop run for Radiohead covers London, Bristol and Manchester. Fans lean Art Rock.')
+  })
+
+  test('stripMetaSentences drops sentences about the fallback or fixture data', () => {
+    const text = 'Mitski plays New York, Chicago and Los Angeles. This plan uses Qloo profiles since Mitski lacks built-in fixture data.'
+    expect(stripMetaSentences(text)).toBe('Mitski plays New York, Chicago and Los Angeles.')
+  })
+
+  test('stripMetaSentences removes trailing ranking disclaimers but keeps the sentence', () => {
+    const text =
+      'Affinities reflect overlap with Adrianne Lenker fans, not venue ranking or order. Stops were picked on Qloo scores, not by guesswork or ranking.'
+    expect(stripMetaSentences(text)).toBe('Affinities reflect overlap with Adrianne Lenker fans. Stops were picked on Qloo scores.')
+  })
+
+  test('polishSummary returns null and logs empty when the reply is only rule echo', async () => {
+    process.env.NEBIUS_API_KEY = 'test-key'
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: 'No additional details beyond the provided data were used.' } }] }),
+    })
+    const result = await polishSummary(mockPlan, 'fallback', { fetchImpl })
+    expect(result).toBeNull()
+    expect(console.warn).toHaveBeenCalledWith('[nebius] fallback: empty')
   })
 
   test('returns null and logs no_time when deadline is in the past', async () => {
