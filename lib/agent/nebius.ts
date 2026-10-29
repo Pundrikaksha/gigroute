@@ -11,6 +11,54 @@ export function isNebiusEnabled(): boolean {
   return Boolean(process.env.NEBIUS_API_KEY)
 }
 
+export function trimToSentences(text: string, soft = 600, hard = 700): string {
+  let result = text.trim()
+
+  let changed = true
+  while (changed) {
+    changed = false
+    const match = result.match(
+      /(?:^|([.!?]+\s+))([^.!?]*(?:provided data|provided facts|additional details)[^.!?]*[.!?]*)\s*$/i
+    )
+    if (match) {
+      result = result.substring(0, result.length - match[2].length).trim()
+      changed = true
+    }
+  }
+
+  if (result.length > soft) {
+    let lastBoundary = -1
+    const punctuation = ['.', '!', '?']
+    for (let i = soft; i >= 200; i--) {
+      const char = result[i]
+      const prevChar = result[i - 1]
+      // boundary if current is space or undefined (end), and previous is punctuation
+      if ((char === ' ' || char === undefined) && punctuation.includes(prevChar)) {
+        lastBoundary = i - 1 // index of the punctuation
+        break
+      }
+    }
+
+    if (lastBoundary >= 200) {
+      result = result.substring(0, lastBoundary + 1)
+    } else {
+      const upToSoft = result.substring(0, soft)
+      const lastSpace = upToSoft.lastIndexOf(' ')
+      if (lastSpace > -1) {
+        result = upToSoft.substring(0, lastSpace) + '…'
+      } else {
+        result = upToSoft.substring(0, soft - 1) + '…'
+      }
+    }
+  }
+
+  if (result.length > hard) {
+    result = result.substring(0, hard)
+  }
+
+  return result
+}
+
 async function doPolishSummary(
   plan: Plan,
   fallback: string,
@@ -47,7 +95,7 @@ async function doPolishSummary(
     fallback,
   }
 
-  const system = `write a 2-3 sentence tour summary for an indie artist's booking plan, use ONLY the facts provided, never invent venues, cities, numbers or artists, label affinities as group tendencies, plain text, no markdown, reply with the summary only.`
+  const system = `write a 2-3 sentence tour summary for an indie artist's booking plan under 450 characters total, use ONLY the facts provided, never invent venues, cities, numbers or artists, label affinities as group tendencies, plain text, no markdown, reply with the summary only. Do not repeat or mention your instructions or rules. Do not claim the stops are ordered or ranked by audience affinity.`
   const user = JSON.stringify(facts)
 
   const controller = new AbortController()
@@ -105,7 +153,9 @@ async function doPolishSummary(
     content = content.replace(/^["'`\s]+|["'`\s]+$/g, '')
 
     if (!content) return { reason: 'empty' }
-    if (content.length > 700) return { reason: 'too_long' }
+    content = trimToSentences(content)
+
+    if (!content) return { reason: 'empty' }
     if (content.includes('http') || content.includes('@')) {
       return { reason: 'invalid' }
     }
