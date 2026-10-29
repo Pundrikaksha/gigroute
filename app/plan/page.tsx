@@ -370,6 +370,11 @@ function PlanContent({ onRetry }: { onRetry: () => void }) {
                 Why this route
               </h2>
               <p className="text-zinc-300">{summary}</p>
+              {plan?.aiModel && (
+                <p className="mt-2 text-xs text-zinc-500">
+                  Summary written by {plan.aiModel} on Nebius Token Factory, from the Qloo data above.
+                </p>
+              )}
             </section>
           )}
           {status === 'done' && stops.length > 0 && plan && (

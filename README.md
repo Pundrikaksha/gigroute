@@ -67,8 +67,16 @@ Set these in `.env.local` for local development (it is gitignored) or in **Verce
 | `LLM_BASE_URL` | No | `LLM_BASE_URL=` | Any OpenAI-compatible chat completions endpoint. Defaults to OpenAI. |
 | `LLM_API_KEY` | For a live LLM | `LLM_API_KEY=` | If empty, the deterministic `MockLLM` plans the tour. |
 | `LLM_MODEL` | With `LLM_API_KEY` | `LLM_MODEL=` | Model name for the endpoint above. Must support tool calling. |
+| `NEBIUS_API_KEY` | No | `NEBIUS_API_KEY=` | Enables Nebius Token Factory summary rewrite when non-empty. |
+| `NEBIUS_BASE_URL` | No | `NEBIUS_BASE_URL=` | Defaults to `https://api.tokenfactory.nebius.com/v1/`. |
+| `NEBIUS_MODEL` | No | `NEBIUS_MODEL=` | Defaults to `nvidia/nemotron-3-super-120b-a12b`. |
+| `NEBIUS_TIMEOUT_MS` | No | `NEBIUS_TIMEOUT_MS=` | Defaults to `8000`. |
 
 **Going live:** set `QLOO_API_KEY` (and leave `QLOO_MOCK` unset). That is the only change. The real client already sends the documented requests (see below). The LLM is independent: with no LLM key, the mock LLM drives the real Qloo client.
+
+## Nebius Token Factory (NVIDIA Nemotron)
+
+GigRoute includes an optional, non-blocking final step that passes the deterministic tour summary and the Qloo facts it was built from to NVIDIA Nemotron on the Nebius Token Factory for rewriting. Set `NEBIUS_API_KEY` to enable it. If it times out, throws an error, or the key is not set, GigRoute seamlessly falls back to the deterministic summary without failing the plan.
 
 ## Deploy to Vercel
 

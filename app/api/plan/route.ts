@@ -4,6 +4,8 @@ import { parsePlanInput } from '@/lib/agent/plan'
 import { isQlooMock } from '@/lib/qloo'
 import { isLLMMock } from '@/lib/agent/llm'
 
+export const maxDuration = 60
+
 // Visible pacing for instant mock runs so the streaming UI is legible in demos.
 const MOCK_STEP_DELAY_MS = 250
 
