@@ -70,7 +70,8 @@ Set these in `.env.local` for local development (it is gitignored) or in **Verce
 | `NEBIUS_API_KEY` | No | `NEBIUS_API_KEY=` | Enables Nebius Token Factory summary rewrite when non-empty. |
 | `NEBIUS_BASE_URL` | No | `NEBIUS_BASE_URL=` | Defaults to `https://api.tokenfactory.nebius.com/v1/`. |
 | `NEBIUS_MODEL` | No | `NEBIUS_MODEL=` | Defaults to `nvidia/nemotron-3-super-120b-a12b`. |
-| `NEBIUS_TIMEOUT_MS` | No | `NEBIUS_TIMEOUT_MS=` | Defaults to `8000`. |
+| `NEBIUS_TIMEOUT_MS` | No | `NEBIUS_TIMEOUT_MS=` | Defaults to `20000`. |
+| `NEBIUS_REASONING` | No | `NEBIUS_REASONING=` | Empty = reasoning off (`reasoning_effort: none` + `chat_template_kwargs.enable_thinking: false`). Set `default` to omit both fields. |
 
 **Going live:** set `QLOO_API_KEY` (and leave `QLOO_MOCK` unset). That is the only change. The real client already sends the documented requests (see below). The LLM is independent: with no LLM key, the mock LLM drives the real Qloo client.
 

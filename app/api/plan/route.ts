@@ -4,12 +4,14 @@ import { parsePlanInput } from '@/lib/agent/plan'
 import { isQlooMock } from '@/lib/qloo'
 import { isLLMMock } from '@/lib/agent/llm'
 
-export const maxDuration = 60
+export const maxDuration = 90
 
 // Visible pacing for instant mock runs so the streaming UI is legible in demos.
 const MOCK_STEP_DELAY_MS = 250
 
 export async function POST(req: NextRequest) {
+  const deadline = Date.now() + (maxDuration - 5) * 1000
+
   let body: unknown
   try {
     body = await req.json()
@@ -37,6 +39,7 @@ export async function POST(req: NextRequest) {
         await runAgent(input, sendEvent, {
           mock: input.demo,
           stepDelayMs: mock && process.env.NODE_ENV !== 'test' ? MOCK_STEP_DELAY_MS : 0,
+          deadline,
         })
       } catch (error) {
         sendEvent({
