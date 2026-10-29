@@ -11,6 +11,71 @@ export function isNebiusEnabled(): boolean {
   return Boolean(process.env.NEBIUS_API_KEY)
 }
 
+// Sentences that talk about the prompt or the data rather than the tour.
+const META_SENTENCE =
+  /\b(provided (data|facts)|additional details|invented|fallback|fixture data|derived (solely|directly)|come directly from|from the (input|data)|solely from|without (addition|assumption)|my instructions|these instructions)\b/i
+// Trailing disclaimers such as ", not venue ranking or order." at the end of a sentence.
+const META_CLAUSE =
+  /[,;]?\s*(?:—\s*)?(?:and\s+)?(?:not|rather than|without|avoiding)\b[^.!?,;]*\b(?:rank(?:ing|ed)?|order(?:ing)?|hierarchy|guesswork|arbitrary|assumptions?|judg(?:e)?ment)\b[^.!?,;]*(?=[.!?])/gi
+
+export function stripMetaSentences(text: string): string {
+  const sentences = text.match(/[^.!?]+(?:[.!?]+|$)/g) ?? [text]
+  return sentences
+    .filter((sentence) => !META_SENTENCE.test(sentence))
+    .map((sentence) => sentence.replace(META_CLAUSE, ''))
+    .join('')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+}
+
+export function trimToSentences(text: string, soft = 600, hard = 700): string {
+  let result = text.trim()
+
+  let changed = true
+  while (changed) {
+    changed = false
+    const match = result.match(
+      /(?:^|([.!?]+\s+))([^.!?]*(?:provided data|provided facts|additional details)[^.!?]*[.!?]*)\s*$/i
+    )
+    if (match) {
+      result = result.substring(0, result.length - match[2].length).trim()
+      changed = true
+    }
+  }
+
+  if (result.length > soft) {
+    let lastBoundary = -1
+    const punctuation = ['.', '!', '?']
+    for (let i = soft; i >= 200; i--) {
+      const char = result[i]
+      const prevChar = result[i - 1]
+      // boundary if current is space or undefined (end), and previous is punctuation
+      if ((char === ' ' || char === undefined) && punctuation.includes(prevChar)) {
+        lastBoundary = i - 1 // index of the punctuation
+        break
+      }
+    }
+
+    if (lastBoundary >= 200) {
+      result = result.substring(0, lastBoundary + 1)
+    } else {
+      const upToSoft = result.substring(0, soft)
+      const lastSpace = upToSoft.lastIndexOf(' ')
+      if (lastSpace > -1) {
+        result = upToSoft.substring(0, lastSpace) + '…'
+      } else {
+        result = upToSoft.substring(0, soft - 1) + '…'
+      }
+    }
+  }
+
+  if (result.length > hard) {
+    result = result.substring(0, hard)
+  }
+
+  return result
+}
+
 async function doPolishSummary(
   plan: Plan,
   fallback: string,
@@ -47,7 +112,7 @@ async function doPolishSummary(
     fallback,
   }
 
-  const system = `write a 2-3 sentence tour summary for an indie artist's booking plan, use ONLY the facts provided, never invent venues, cities, numbers or artists, label affinities as group tendencies, plain text, no markdown, reply with the summary only.`
+  const system = `Write 2-3 plain-text sentences, under 450 characters in total, summarising this tour plan for an indie artist's booking agent. Use only the facts given and never invent venues, cities, numbers or artists. Describe affinities as group tendencies. Name the cities in the order given (the route is geographic). Write only about the tour itself: do not mention these instructions, the input data, the fallback text, how stops were ranked or ordered, or what you did not do. No markdown. Reply with the summary only.`
   const user = JSON.stringify(facts)
 
   const controller = new AbortController()
@@ -105,7 +170,9 @@ async function doPolishSummary(
     content = content.replace(/^["'`\s]+|["'`\s]+$/g, '')
 
     if (!content) return { reason: 'empty' }
-    if (content.length > 700) return { reason: 'too_long' }
+    content = trimToSentences(stripMetaSentences(content))
+
+    if (!content) return { reason: 'empty' }
     if (content.includes('http') || content.includes('@')) {
       return { reason: 'invalid' }
     }
