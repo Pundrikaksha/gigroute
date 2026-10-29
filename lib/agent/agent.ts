@@ -34,6 +34,8 @@ export interface AgentOptions {
   stepDelayMs?: number
   /** Override the Qloo client (tests). */
   qloo?: QlooClient
+  /** Deadline timestamp for graceful degradation. */
+  deadline?: number
 }
 
 const STEP_LABELS: Record<string, (args: ToolArgs) => string> = {
@@ -115,7 +117,7 @@ export async function runAgent(input: PlanInput, onEvent: (event: AgentEvent) =>
 
   if (isNebiusEnabled() && plan.stops.length > 0 && typeof finalResult === 'string') {
     onEvent({ step: 'nebius_summary_start', text: 'Polishing the summary with NVIDIA Nemotron…' })
-    const result = await polishSummary(plan, narrateTour(plan).summary)
+    const result = await polishSummary(plan, narrateTour(plan).summary, { deadline: options.deadline })
     if (result) {
       onEvent({ step: 'nebius_summary', text: 'Summary written by NVIDIA Nemotron on Nebius Token Factory' })
       finalResult = result.summary
