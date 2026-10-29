@@ -38,6 +38,8 @@ export interface Plan {
   merch: QlooEntity[]
   pitch?: string
   routed: boolean
+  aiSummary?: string
+  aiModel?: string
 }
 
 export interface Driver {
@@ -435,7 +437,8 @@ export function planToJSON(plan: Plan, origin = ''): string {
       tags: plan.artist.tags.map((t) => t.name),
       ...(plan.artist.sampleOf ? { sampleProfile: plan.artist.sampleOf } : {}),
     },
-    summary: narrative.summary,
+    summarySource: plan.aiModel ? `nebius:${plan.aiModel}` : 'deterministic',
+    summary: plan.aiSummary ?? narrative.summary,
     coBills: plan.similarArtists.map((a) => ({ name: a.name, affinity: a.affinity })),
     stops: plan.stops.map((stop, i) => ({
       city: stop.city,
@@ -463,7 +466,8 @@ export function planToMarkdown(plan: Plan, origin = ''): string {
   let md = `# Tour plan for ${plan.artist?.name ?? plan.input.artist}\n\n`
   md += `_Affinities describe group tendencies of audiences, not individual preferences._\n\n`
   md += `Permalink: ${origin}${planHref(plan.input)}\n\n`
-  if (narrative.summary) md += `${narrative.summary}\n\n`
+  const summary = plan.aiSummary ?? narrative.summary
+  if (summary) md += `${summary}\n\n`
   if (plan.similarArtists.length > 0) {
     md += `**Co-bill ideas:** ${plan.similarArtists.map((a) => a.name).join(', ')}\n\n`
   }

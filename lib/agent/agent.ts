@@ -3,7 +3,8 @@ import type { ChatCompletionMessageParam } from 'openai/resources/chat/completio
 import { getLLMClient } from './llm'
 import { tools, executeTool, type ToolArgs } from './tools'
 import { getQlooClient, type QlooClient } from '../qloo'
-import { applyToolResult, createPlan, NO_PLAN_STATUS, type Plan, type PlanInput } from './plan'
+import { applyToolResult, createPlan, NO_PLAN_STATUS, narrateTour, type Plan, type PlanInput } from './plan'
+import { isNebiusEnabled, polishSummary } from './nebius'
 
 const MAX_LLM_CALLS = 12
 
@@ -110,6 +111,16 @@ export async function runAgent(input: PlanInput, onEvent: (event: AgentEvent) =>
     if (outcomes[outcomes.length - 1]?.status === 'rejected') onEvent({ step: 'plan', text: 'Plan updated.', plan })
 
     if (options.stepDelayMs) await sleep(options.stepDelayMs)
+  }
+
+  if (isNebiusEnabled() && plan.stops.length > 0 && typeof finalResult === 'string') {
+    onEvent({ step: 'nebius_summary_start', text: 'Polishing the summary with NVIDIA Nemotron…' })
+    const result = await polishSummary(plan, narrateTour(plan).summary)
+    if (result) {
+      onEvent({ step: 'nebius_summary', text: 'Summary written by NVIDIA Nemotron on Nebius Token Factory' })
+      finalResult = result.summary
+      plan = { ...plan, aiSummary: result.summary, aiModel: result.model }
+    }
   }
 
   // A resolved artist with no cities is a finished no-plan, not a tour that is still in progress.
